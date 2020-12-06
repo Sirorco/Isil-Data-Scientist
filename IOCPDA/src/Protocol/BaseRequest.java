@@ -8,6 +8,7 @@ package Protocol;
 /**
  *
  * @author Thomas
+ * IOCPDA : Input Output Container Platform Data Analyse
  */
 public class BaseRequest {
     //Requests IDs
