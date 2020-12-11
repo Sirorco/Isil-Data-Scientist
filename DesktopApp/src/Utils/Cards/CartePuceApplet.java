@@ -59,7 +59,6 @@ public class CartePuceApplet extends Applet
         return true;
     }
     
-    @Override
     public void process(APDU apdu) throws ISOException
     {
         byte[] buffer = apdu.getBuffer();
