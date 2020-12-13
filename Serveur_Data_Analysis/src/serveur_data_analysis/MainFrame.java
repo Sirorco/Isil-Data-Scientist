@@ -17,6 +17,7 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form FenêtrePrincipale
      */
     public MainFrame() {
+        initComponents();
     }
 
     /**
