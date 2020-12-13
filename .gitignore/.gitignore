@@ -22,5 +22,5 @@
 hs_err_pid*
 
 #Fichiers à ignorer 
-Serveur_Data_Analysis/build/
-Serveur_Data_Analysis/nbproject/private/
+build/
+private/
