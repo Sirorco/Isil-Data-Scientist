@@ -11,10 +11,12 @@ import Protocol.RequestBigDataResult;
 import Protocol.RequestDoBigData;
 import Protocol.RequestLogin;
 import Protocol.RequestLoginInitiator;
+import connectionJdbc.BeanJDBC;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +31,8 @@ public class TraitementClient implements Runnable {
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     
+    private BeanJDBC beanJdbc; //Objet pour la connexion à la BDD
+    
     
     public TraitementClient(Socket cSocket, MainFrame mF)
     {
@@ -40,6 +44,12 @@ public class TraitementClient implements Runnable {
         } catch (IOException ex) {
             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
         }
+        //Recherche des infos dans le fichier properties
+        ResourceBundle bundle = ResourceBundle.getBundle("properties.fichConfig");
+        String name = bundle.getString("sgbd.name");
+        String user = bundle.getString("sgbd.user");
+        String mdp = bundle.getString("sgbd.mdp");
+        beanJdbc = new BeanJDBC(name, user, mdp);
         
     }
     

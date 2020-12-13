@@ -28,7 +28,7 @@ public class MainServer {
         this.mF = mF;
         //Recherche des infos dans le fichier properties
         ResourceBundle bundle = ResourceBundle.getBundle("properties.fichConfig");
-        port = Integer.parseInt(bundle.getString("sgbd.name"));
+        port = Integer.parseInt(bundle.getString("socket.portServer"));
         try {
             sSocket = new ServerSocket(port);
         } catch (IOException ex) {
