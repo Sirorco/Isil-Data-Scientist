@@ -24,3 +24,10 @@ hs_err_pid*
 #Fichiers à ignorer 
 build/
 private/
+
+IOCPDA/build/
+IOCPDA/private/
+
+WebAppli_BigData/build/
+WebAppli_BigData/dist/
+WebAppli_BigData/private/
