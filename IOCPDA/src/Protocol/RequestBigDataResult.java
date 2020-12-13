@@ -11,7 +11,7 @@ import java.util.Hashtable;
  *
  * @author Thomas
  */
-public class RequestBigDataResult {
+public class RequestBigDataResult extends BaseRequest {
     
     private Hashtable data;
 
