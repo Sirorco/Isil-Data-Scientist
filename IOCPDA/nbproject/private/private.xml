@@ -2,6 +2,12 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/Thomas/Documents/Etudes%20Supérieures/Bloc%206%202020-2021/Vilvens/Java/Labo/Labo2/Isil-Data-Scientist/IOCPDA/src/Protocol/RequestLoginInitiator.java</file>
+            <file>file:/C:/Users/Thomas/Documents/Etudes%20Supérieures/Bloc%206%202020-2021/Vilvens/Java/Labo/Labo2/Isil-Data-Scientist/IOCPDA/src/Protocol/BaseRequest.java</file>
+            <file>file:/C:/Users/Thomas/Documents/Etudes%20Supérieures/Bloc%206%202020-2021/Vilvens/Java/Labo/Labo2/Isil-Data-Scientist/IOCPDA/src/Protocol/RequestBigDataResult.java</file>
+            <file>file:/C:/Users/Thomas/Documents/Etudes%20Supérieures/Bloc%206%202020-2021/Vilvens/Java/Labo/Labo2/Isil-Data-Scientist/IOCPDA/src/Protocol/RequestDoBigData.java</file>
+            <file>file:/C:/Users/Thomas/Documents/Etudes%20Supérieures/Bloc%206%202020-2021/Vilvens/Java/Labo/Labo2/Isil-Data-Scientist/IOCPDA/src/Protocol/RequestLogin.java</file>
+        </group>
     </open-files>
 </project-private>
