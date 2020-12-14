@@ -12,7 +12,7 @@ package Protocol;
 public class RequestLogin extends BaseRequest {
     
     private String username;
-    private Byte[] digest;
+    private byte[] digest;
 
     /**
      * @return the username
@@ -31,14 +31,14 @@ public class RequestLogin extends BaseRequest {
     /**
      * @return the digest
      */
-    public Byte[] getDigest() {
+    public byte[] getDigest() {
         return digest;
     }
 
     /**
      * @param Digest the digest to set
      */
-    public void setDigest(Byte[] Digest) {
+    public void setDigest(byte[] Digest) {
         this.digest = Digest;
     }
 }
