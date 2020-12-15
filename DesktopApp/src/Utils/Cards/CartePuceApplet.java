@@ -19,10 +19,11 @@ import javacard.framework.Util;
 public class CartePuceApplet extends Applet
 {
     //CONSTANTES
-    final static byte CartePuceLogin_CLA =(byte)0xB0;
+    public final static byte CartePuceLogin_CLA =(byte)0xB0;
     
-    final static byte VERIFY = (byte) 0x20;
-    final static byte GET_LOGINS = (byte) 0x30;
+    public final static byte VERIFY = (byte) 0x20;
+    public final static byte GET_LOGINS = (byte) 0x30;
+    public final static byte LOGIN_DONE = (byte) 0x40;
     
     final static short SW_VERIFICATION_FAILED = 0x6300;
     final static short SW_PIN_VERIFICATION_REQUIRED = 0x6301;
@@ -75,6 +76,7 @@ public class CartePuceApplet extends Applet
                         return;
             case VERIFY:    verify(apdu);
                             return; 
+            case LOGIN_DONE: loginDone();
             default: ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
         }
     }
@@ -87,8 +89,6 @@ public class CartePuceApplet extends Applet
         byte byteRead = (byte)(apdu.setIncomingAndReceive());
         if ( pin.check(buffer, ISO7816.OFFSET_CDATA, byteRead) == false )
             ISOException.throwIt (SW_VERIFICATION_FAILED);
-        
-        nbreConnexions++;
     }
     
     
@@ -100,6 +100,9 @@ public class CartePuceApplet extends Applet
         short le = apdu.setOutgoing();
         if ( le < 2 )
             ISOException.throwIt (ISO7816.SW_WRONG_LENGTH);
+        
+        if ( ! pin.isValidated() )
+            ISOException.throwIt(SW_PIN_VERIFICATION_REQUIRED);
         
         apdu.setOutgoingLength((byte)2);
         
@@ -113,6 +116,13 @@ public class CartePuceApplet extends Applet
     public void deselect()
     {
         pin.reset();
+    }
+
+    private void loginDone() {
+        if ( ! pin.isValidated() )
+            ISOException.throwIt(SW_PIN_VERIFICATION_REQUIRED);
+        
+        nbreConnexions++;
     }
 
 }

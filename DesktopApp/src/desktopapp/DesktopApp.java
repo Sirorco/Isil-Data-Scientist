@@ -15,7 +15,10 @@ public class DesktopApp {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+       MainWindow window = new MainWindow();
+       window.login();
+       
+       System.exit(0);
     }
     
 }

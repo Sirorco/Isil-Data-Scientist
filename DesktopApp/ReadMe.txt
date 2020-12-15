@@ -5,7 +5,7 @@ Pour l'applet à installer:
 
 Faire le CAP File:
 
-/!\ compiler la classe cartePuceApplet avec un ancien jdk (1.2)
+/!\ compiler la classe cartePuceApplet avec un ancien jdk (1.2) -> Depuis DesktopApp : javac -classpath src\JARS\javacardframework.jar -d build\classes src\Utils\Cards\CartePuceApplet.java
 Créer le cap en se plaçant dans DesktopApp\build\classes et exécuter ..\..\java_card_kit-2_2_1\bin\converter.bat -config ..\..\carteAPuces\cartePuceApplet.opt
 Il faudra changer le chemin de l'export path dans le fichier cartePuceApplet pour qu'il corresponde bien à votre chemin
 Il y a des variables d'environnement à setter : JC_HOME avec le chemin vers le répertoire java card kit 
@@ -13,7 +13,7 @@ Il y a des variables d'environnement à setter : JC_HOME avec le chemin vers le 
 /!\ à qu'il n'y ait pas d'espaces dans les chemins d'accès
 
 Installer l'applet:
-java_card_kit-2_2_1\bin\scriptgen.bat -o carteAPuces\applInstall.scr build\classes\Utils\Cards\javacard
+java_card_kit-2_2_1\bin\scriptgen.bat -o carteAPuces\applInstall.scr build\classes\Utils\Cards\javacard\Cards.cap
 
 modifier applInstal.scr:
 ajouter au début:
@@ -32,3 +32,6 @@ java_card_kit-2_2_1\bin\cref.exe -o carteAPuces\eepromCartePuce
 
 installer:
 java_card_kit-2_2_1\bin\apdutool.bat -o carteAPuces\logsInstall carteAPuces\applInstall.scr
+
+tester avec le script de test:
+java_card_kit-2_2_1\bin\apdutool.bat -o carteAPuces\testScript.log carteAPuces\testScript.scr
