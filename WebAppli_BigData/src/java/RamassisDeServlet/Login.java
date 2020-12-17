@@ -25,7 +25,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
-import java.util.Hashtable;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,12 +32,11 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.annotation.WebInitParam;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import java.util.*;
 
 /**
  *
@@ -175,9 +173,10 @@ public class Login extends HttpServlet {
         
             System.out.println("Instanciation du message digest");
             MessageDigest md = MessageDigest.getInstance("SHA-1", "BC");
-            md.update(pswd.getBytes());
-            md.update(reqloginit.getSaltChallenge().getBytes());
-            reqlog.setDigest(md.digest());
+            Vector<String> Components = new Vector<String>();
+            Components.add(reqloginit.getSaltChallenge());
+            Components.add(pswd);
+            reqlog.CalculateDigest(md, Components);
             
             oos.writeObject(reqlog);
             oos.flush();
