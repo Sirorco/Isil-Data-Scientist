@@ -14,11 +14,13 @@ public class BaseRequest {
     //Requests IDs
     public static final int LOGIN_INITIATOR = 0;
     public static final int LOGIN_EID = 1;
-    public static final int LOGIN_OTP = 2;
-    public static final int LOGIN_WEB = 3;
-    public static final int DO_BIG_DATA = 4;
-    public static final int BIG_DATA_RESULT = 5;
-    public static final int LOGOUT = 6;
+    public static final int LOGIN_CARTES_A_PUCES = 2;
+    public static final int LOGIN_CREATE_OTP = 3;
+    public static final int LOGIN_VERIFY_OTP = 4;
+    public static final int LOGIN_WEB = 5;
+    public static final int DO_BIG_DATA = 6;
+    public static final int BIG_DATA_RESULT = 7;
+    public static final int LOGOUT = 8;
     
     private int id;
     private boolean status;
