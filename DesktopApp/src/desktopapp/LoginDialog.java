@@ -7,18 +7,30 @@ package desktopapp;
 
 import Protocol.BaseRequest;
 import Protocol.RequestLogin;
+import Protocol.RequestLoginInitiator;
 import Utils.Cards.CartePuceApplet;
 import com.sun.javacard.apduio.Apdu;
 import com.sun.javacard.apduio.CadClient;
 import com.sun.javacard.apduio.TLP224Exception;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.Security;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.Vector;
 import javax.smartcardio.*;
 import javax.swing.JOptionPane;
@@ -250,8 +262,37 @@ public class LoginDialog extends javax.swing.JDialog {
         }
     }
 
-    private void loginId() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void loginId() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, InvalidKeyException, ClassNotFoundException, SignatureException {
+        //Demande un challenge
+        RequestLoginInitiator reqChall = new RequestLoginInitiator();
+        reqChall.setId(BaseRequest.LOGIN_INITIATOR);
+        
+        outputStream.writeObject(reqChall);
+        reqChall = (RequestLoginInitiator)inputStream.readObject();
+        
+        String challenge = reqChall.getSaltChallenge();
+
+        //ajout du provider - sinon, l'ajouter dans java.security
+        ByteArrayInputStream bais = new ByteArrayInputStream("name = beid\nlibrary = C:\\Windows\\System32\\beidpkcs11.dll".getBytes());
+        Provider pkcs11Provider = new sun.security.pkcs11.SunPKCS11(bais);
+        Security.addProvider(pkcs11Provider);
+        
+        KeyStore idKs = KeyStore.getInstance("PKCS11");
+        idKs.load(null, null);
+        
+        PrivateKey cle = (PrivateKey) idKs.getKey("Signature",  null);
+        Signature s = Signature.getInstance("SHA1withRSA");
+        s.initSign(cle);
+        s.update(challenge.getBytes());
+        
+        RequestLogin req = new RequestLogin();
+        req.setId(BaseRequest.LOGIN_EID);
+        req.setUsername(loginText.getText());
+        req.setDigest(s.sign());
+        
+        outputStream.writeObject(req);
+        req = (RequestLogin)inputStream.readObject();
+        ok = req.getStatus();
     }
     
     private boolean sendLoginPuce(Vector<String> values) throws NoSuchAlgorithmException, IOException, ClassNotFoundException
