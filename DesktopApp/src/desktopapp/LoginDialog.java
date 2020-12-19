@@ -226,7 +226,7 @@ public class LoginDialog extends javax.swing.JDialog {
         values.add(pin);
         values.add(Integer.toString(nbreCo));
         
-        if(sendLogin(values))
+        if(sendLoginPuce(values))
         {
             //Si server ok
             apdu.command = loginDone;
@@ -254,10 +254,10 @@ public class LoginDialog extends javax.swing.JDialog {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    private boolean sendLogin(Vector<String> values) throws NoSuchAlgorithmException, IOException, ClassNotFoundException
+    private boolean sendLoginPuce(Vector<String> values) throws NoSuchAlgorithmException, IOException, ClassNotFoundException
     {
         RequestLogin req = new RequestLogin();
-        req.setId(BaseRequest.LOGIN_EID);
+        req.setId(BaseRequest.LOGIN_CARTES_A_PUCES);
         req.setUsername(loginText.getText());
         
         MessageDigest md = MessageDigest.getInstance("SHA-256");
