@@ -5,14 +5,21 @@
  */
 package desktopapp;
 
+import Protocol.BaseRequest;
+import Protocol.RequestLogin;
 import Utils.Cards.CartePuceApplet;
 import com.sun.javacard.apduio.Apdu;
 import com.sun.javacard.apduio.CadClient;
 import com.sun.javacard.apduio.TLP224Exception;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Vector;
 import javax.smartcardio.*;
 import javax.swing.JOptionPane;
 
@@ -32,21 +39,23 @@ public class LoginDialog extends javax.swing.JDialog {
     
     private Socket carteSo;
     private CadClient cad;
+    private ObjectInputStream inputStream;
+    private ObjectOutputStream outputStream;
     
     /**
      * Creates new form LoginDialog
      * @param parent
      * @param modal
+     * @param inputStream
+     * @param outputStream
      */
-    public LoginDialog(java.awt.Frame parent, boolean modal) {
+    public LoginDialog(java.awt.Frame parent, boolean modal,ObjectInputStream inputStream, ObjectOutputStream outputStream) {
         super(parent, modal);
         initComponents();
+        
         ok=false;
-    }
-    
-    public String getLogin()
-    {
-        return loginText.getText();
+        this.inputStream = inputStream;
+        this.outputStream = outputStream;
     }
     
 
@@ -146,47 +155,11 @@ public class LoginDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_okButtonActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LoginDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LoginDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LoginDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(LoginDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                LoginDialog dialog = new LoginDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
+    public boolean isOk()
+    {
+        return ok;
     }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton IdRadioButton;
@@ -198,7 +171,7 @@ public class LoginDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton puceRadioButton;
     // End of variables declaration//GEN-END:variables
 
-    private void loginPuce() throws IOException, CardException, TLP224Exception {
+    private void loginPuce() throws IOException, CardException, TLP224Exception, NoSuchAlgorithmException, ClassNotFoundException {
         Apdu apdu = new Apdu();;
         if(carteSo == null)
         {
@@ -218,9 +191,10 @@ public class LoginDialog extends javax.swing.JDialog {
         
         //vérification du pin
         boolean pinOk = false;
+        String pin;
         do
         {
-            String pin = JOptionPane.showInputDialog(this, "Entrez votre code pin :");
+            pin = JOptionPane.showInputDialog(this, "Entrez votre code pin :");
             if(pin.length() != 4)
             {
                 JOptionPane.showMessageDialog(this, "Wrong pin, try again", "AOUCH", JOptionPane.ERROR_MESSAGE);
@@ -248,29 +222,49 @@ public class LoginDialog extends javax.swing.JDialog {
         int nbreCo = Byte.toUnsignedInt(data[0])*256 + Byte.toUnsignedInt(data[1]);
         
         System.out.println("Nbre de connexions :"+nbreCo);
+        Vector<String> values = new Vector();
+        values.add(pin);
+        values.add(Integer.toString(nbreCo));
         
-        //Si server ok
-        apdu.command = loginDone;
-        apdu.setDataIn(new byte[0]);
-        apdu.Le = 0X00;
-        cad.exchangeApdu(apdu);
-        
-        //vérification du nombre de login
-        apdu.command = getLogins;
-        apdu.setDataIn(new byte[0]);
-        apdu.Le = 0X02;
-        cad.exchangeApdu(apdu);
-        data = apdu.getDataOut();
-        nbreCo = Byte.toUnsignedInt(data[0])*256 + Byte.toUnsignedInt(data[1]);
-        
-        System.out.println("Nbre de connexions :"+nbreCo);
-        
-        cad.powerDown();
-        cad.close();
-        ok = true;
+        if(sendLogin(values))
+        {
+            //Si server ok
+            apdu.command = loginDone;
+            apdu.setDataIn(new byte[0]);
+            apdu.Le = 0X00;
+            cad.exchangeApdu(apdu);
+
+            //vérification du nombre de login
+            apdu.command = getLogins;
+            apdu.setDataIn(new byte[0]);
+            apdu.Le = 0X02;
+            cad.exchangeApdu(apdu);
+            data = apdu.getDataOut();
+            nbreCo = Byte.toUnsignedInt(data[0])*256 + Byte.toUnsignedInt(data[1]);
+
+            System.out.println("Nbre de connexions :"+nbreCo);
+
+            cad.powerDown();
+            cad.close();
+            ok = true;
+        }
     }
 
     private void loginId() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    private boolean sendLogin(Vector<String> values) throws NoSuchAlgorithmException, IOException, ClassNotFoundException
+    {
+        RequestLogin req = new RequestLogin();
+        req.setId(BaseRequest.LOGIN_EID);
+        req.setUsername(loginText.getText());
+        
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        req.CalculateDigest(md, values);
+        
+        outputStream.writeObject(req);
+        req = (RequestLogin)inputStream.readObject();
+        return req.getStatus();
     }
 }
