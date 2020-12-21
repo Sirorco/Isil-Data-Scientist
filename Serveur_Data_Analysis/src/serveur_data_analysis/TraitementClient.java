@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +64,6 @@ public class TraitementClient implements Runnable {
         BaseRequest requeteBaseClient;
         BaseRequest reponseClient;
         
-        
         try {
             while((requeteBaseClient = (BaseRequest) ois.readObject()).getId() != BaseRequest.LOGOUT)
             {
@@ -74,7 +75,11 @@ public class TraitementClient implements Runnable {
                     System.out.println("Thread :" + this.toString() + "Traitement initialisation login");
                     
                     // Traitement initialisation login
-                    
+                    SecureRandom sr = new SecureRandom();
+                    byte[] byteSr = new byte[256];
+                    sr.nextBytes(byteSr);
+                    requeteClient.setSaltChallenge(Arrays.toString(byteSr));
+                    System.out.println(Arrays.toString(byteSr));
                     oos.writeObject(reponseClient);
                 }
                 
@@ -89,13 +94,13 @@ public class TraitementClient implements Runnable {
                     oos.writeObject(reponseClient);
                 }
                 
-                if(requeteBaseClient.getId() == BaseRequest.LOGIN_OTP)
+                if(requeteBaseClient.getId() == BaseRequest.LOGIN_CARTES_A_PUCES)
                 {
                     RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
                     mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement login OTP");
                     System.out.println("Thread :" + this.toString() + "Traitement login OTP");
                     
-                    //Traitement login OTP
+                    //Traitement login carte à puce
                     
                     oos.writeObject(reponseClient);
                 }
