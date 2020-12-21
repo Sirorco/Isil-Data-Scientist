@@ -63,6 +63,7 @@ public class TraitementClient implements Runnable {
         boolean finConnexion = false;
         BaseRequest requeteBaseClient;
         BaseRequest reponseClient;
+        String saltClient = null;
         
         try {
             while((requeteBaseClient = (BaseRequest) ois.readObject()).getId() != BaseRequest.LOGOUT)
@@ -78,8 +79,9 @@ public class TraitementClient implements Runnable {
                     SecureRandom sr = new SecureRandom();
                     byte[] byteSr = new byte[256];
                     sr.nextBytes(byteSr);
-                    requeteClient.setSaltChallenge(Arrays.toString(byteSr));
-                    System.out.println(Arrays.toString(byteSr));
+                    saltClient = Arrays.toString(byteSr);
+                    requeteClient.setSaltChallenge(saltClient);
+                    
                     oos.writeObject(reponseClient);
                 }
                 
