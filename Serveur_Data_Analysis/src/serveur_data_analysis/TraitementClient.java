@@ -104,14 +104,54 @@ public class TraitementClient implements Runnable {
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_CARTES_A_PUCES)
                 {
                     RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
-                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement login OTP");
-                    System.out.println("Thread :" + this.toString() + "Traitement login OTP");
+                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement login carte à puces");
+                    System.out.println("Thread :" + this.toString() + "Traitement login carte à puces");
                     
                     //Traitement login carte à puce
+                    if(saltClient != null)
+                    {
+                        ResultSet rs = beanJdbc.SelectAllWhere("personnel", "login = \"" + requeteClient.getUsername() + "\"", BeanJDBC.NO_UPDATE);
+                        try {
+                            if(rs.next())
+                            {
+                                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                                Vector<String> components = new Vector<String>();
+                                // Faut-il saller dans ce cas-ci aussi ?? Je ne vois pas qu'il demande ça dans les consignes mais je me dis que si on ne salle pas autant envoyer le message en clair et ne pas faire de digest.
+                                components.add(saltClient);
+                                //Dans ce cas-ci login == username aussi
+                                String login = rs.getString("login");
+                                components.add(login);
+                                String code = rs.getString("code");
+                                components.add(code);
+                                String password = rs.getString("password");
+                                components.add(password);
+                                String cptAcces = rs.getString("compteur acces");
+                                components.add(cptAcces);
+                                if(requeteClient.VerifyDigest(md, components))
+                                {
+                                    int tempCptAcces = Integer.parseInt(cptAcces);
+                                    tempCptAcces++;
+                                    // Mise à jour de la bdd pour l'incrémentation du compteur d'accès! 
+                                    beanJdbc.Update("personnel", "login = \"" + requeteClient.getUsername() + "\"", "compteur acces", Integer.toString(tempCptAcces));
+                                    requeteClient.setStatus(true);
+                                }
+                                else
+                                    requeteClient.setStatus(false);
+                            }
+                            else
+                                requeteClient.setStatus(false);
+                        } catch (SQLException ex) {
+                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (NoSuchAlgorithmException ex) {
+                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    else
+                        requeteClient.setStatus(false);
                     
                     oos.writeObject(requeteClient);
                 }
-                
+                                
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_WEB)
                 {
                     RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
