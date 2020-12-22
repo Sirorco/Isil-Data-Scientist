@@ -151,6 +151,28 @@ public class TraitementClient implements Runnable {
                     
                     oos.writeObject(requeteClient);
                 }
+                
+                if(requeteBaseClient.getId() == BaseRequest.LOGIN_CREATE_OTP)
+                {
+                    RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
+                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Création de l'otp");
+                    System.out.println("Thread :" + this.toString() + "Création de l'otp");
+                    
+                    //Création de l'otp
+                    
+                    oos.writeObject(requeteClient);
+                }
+                
+                if(requeteBaseClient.getId() == BaseRequest.LOGIN_VERIFY_OTP)
+                {
+                    RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
+                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Vérification de l'otp");
+                    System.out.println("Thread :" + this.toString() + "Vérification de l'otp");
+                    
+                    //Vérification de l'otp
+                    
+                    oos.writeObject(requeteClient);
+                }
                                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_WEB)
                 {
