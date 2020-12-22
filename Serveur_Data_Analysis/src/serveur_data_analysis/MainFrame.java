@@ -42,7 +42,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Serveur_Bateaux");
+        jLabel1.setText("Serveur_Data_Analysis");
         getContentPane().add(jLabel1);
 
         jPanelEnvoi.setLayout(new java.awt.GridLayout(0, 1));
