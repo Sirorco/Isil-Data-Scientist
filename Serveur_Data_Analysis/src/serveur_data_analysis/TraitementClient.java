@@ -80,6 +80,7 @@ public class TraitementClient implements Runnable {
         try {
             while((requeteBaseClient = (BaseRequest) ois.readObject()).getId() != BaseRequest.LOGOUT)
             {
+                reponseClient = new BaseRequest();
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_INITIATOR)
                 {
                     RequestLoginInitiator requeteClient = (RequestLoginInitiator) requeteBaseClient;
@@ -119,20 +120,20 @@ public class TraitementClient implements Runnable {
                                 s.initVerify(pk);
                                 s.update(saltClient.getBytes());
                                 if(s.verify(requeteClient.getDigest()))
-                                    requeteClient.setStatus(true);
+                                    reponseClient.setStatus(true);
                                 else
-                                    requeteClient.setStatus(false);
+                                    reponseClient.setStatus(false);
                             }
                             else
-                                requeteClient.setStatus(false);
+                                reponseClient.setStatus(false);
                             
                         } catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | InvalidKeyException | SQLException | SignatureException ex) {
                             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
                         } 
                     }
                     else
-                        requeteClient.setStatus(false);
-                    oos.writeObject(requeteClient);
+                        reponseClient.setStatus(false);
+                    oos.writeObject(reponseClient);
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_CARTES_A_PUCES)
@@ -169,21 +170,21 @@ public class TraitementClient implements Runnable {
                                     tempCptAcces++;
                                     // Mise à jour de la bdd pour l'incrémentation du compteur d'accès! 
                                     beanJdbc.Update("personnel", "login = \"" + requeteClient.getUsername() + "\"", "compteur acces", Integer.toString(tempCptAcces));
-                                    requeteClient.setStatus(true);
+                                    reponseClient.setStatus(true);
                                 }
                                 else
-                                    requeteClient.setStatus(false);
+                                    reponseClient.setStatus(false);
                             }
                             else
-                                requeteClient.setStatus(false);
+                                reponseClient.setStatus(false);
                         } catch (SQLException | NoSuchAlgorithmException ex) {
                             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                     else
-                        requeteClient.setStatus(false);
+                        reponseClient.setStatus(false);
                     
-                    oos.writeObject(requeteClient);
+                    oos.writeObject(reponseClient);
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_OTP)
@@ -193,8 +194,38 @@ public class TraitementClient implements Runnable {
                     System.out.println("Thread :" + this.toString() + "Création de l'otp");
                     
                     //Création de l'otp
+                    if(saltClient != null)
+                    {
+                        ResultSet rs = beanJdbc.SelectAllWhere("personnel", "login = \"" + requeteClient.getUsername() + "\"", BeanJDBC.NO_UPDATE); // Le username de la requeteClient (RequestLogin) correspond au login dans la bdd compta table personnel
+                        try {
+                            if(rs.next())
+                            {
+                              MessageDigest md = MessageDigest.getInstance("SHA-256");
+                              Vector<String> components = new Vector<String>();
+                              components.add(saltClient);
+                              String login = rs.getString("login");
+                              components.add(login);
+                              String pin = rs.getString("pin");
+                              components.add(pin);
+                              if(requeteClient.VerifyDigest(md, components))
+                              {
+                                  reponseClient.setStatus(true);
+                              }
+                              else
+                                  reponseClient.setStatus(false);
+                            }
+                            else
+                                reponseClient.setStatus(false);
+                        } catch (SQLException ex) {
+                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (NoSuchAlgorithmException ex) {
+                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    else
+                        reponseClient.setStatus(false);
                     
-                    oos.writeObject(requeteClient);
+                    oos.writeObject(reponseClient);
                 }
                                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_WEB)
@@ -217,23 +248,21 @@ public class TraitementClient implements Runnable {
                                 String password = rs.getString("mot de passe");
                                 components.add(password);
                                 if(requeteClient.VerifyDigest(md, components))
-                                {
-                                    requeteClient.setStatus(true);
-                                }
+                                    reponseClient.setStatus(true);
                                 else
-                                    requeteClient.setStatus(false);
+                                    reponseClient.setStatus(false);
                             }
                             else
-                                requeteClient.setStatus(false);
+                                reponseClient.setStatus(false);
                             
                         } catch (SQLException | NoSuchAlgorithmException ex) {
                             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                     else
-                        requeteClient.setStatus(false);
+                        reponseClient.setStatus(false);
                     
-                    oos.writeObject(requeteClient);
+                    oos.writeObject(reponseClient);
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.DO_BIG_DATA)
