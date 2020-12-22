@@ -92,6 +92,7 @@ public class TraitementClient implements Runnable {
                     sr.nextBytes(byteSr);
                     saltClient = Arrays.toString(byteSr);
                     requeteClient.setSaltChallenge(saltClient);
+                    requeteClient.setStatus(true);
                     
                     oos.writeObject(requeteClient);
                 }
@@ -185,24 +186,13 @@ public class TraitementClient implements Runnable {
                     oos.writeObject(requeteClient);
                 }
                 
-                if(requeteBaseClient.getId() == BaseRequest.LOGIN_CREATE_OTP)
+                if(requeteBaseClient.getId() == BaseRequest.LOGIN_OTP)
                 {
                     RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
                     mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Création de l'otp");
                     System.out.println("Thread :" + this.toString() + "Création de l'otp");
                     
                     //Création de l'otp
-                    
-                    oos.writeObject(requeteClient);
-                }
-                
-                if(requeteBaseClient.getId() == BaseRequest.LOGIN_VERIFY_OTP)
-                {
-                    RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
-                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Vérification de l'otp");
-                    System.out.println("Thread :" + this.toString() + "Vérification de l'otp");
-                    
-                    //Vérification de l'otp
                     
                     oos.writeObject(requeteClient);
                 }
