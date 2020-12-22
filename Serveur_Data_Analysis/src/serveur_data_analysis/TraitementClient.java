@@ -73,7 +73,6 @@ public class TraitementClient implements Runnable {
     public void run() {
         mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Lancement du thread de traitement client !");
         System.out.println("Thread :" + this.toString() + "Lancement du thread de traitement client !");
-        boolean finConnexion = false;
         BaseRequest requeteBaseClient;
         BaseRequest reponseClient;
         String saltClient = null;
@@ -132,9 +131,6 @@ public class TraitementClient implements Runnable {
                     }
                     else
                         requeteClient.setStatus(false);
-                    
-                    
-                    
                     oos.writeObject(requeteClient);
                 }
                 
@@ -263,25 +259,22 @@ public class TraitementClient implements Runnable {
                     if(requeteClient.getTypetraitement() == RequestDoBigData.ACP)
                     {
                         // Traitement de l'ACP (Faire un objet)
-                        oos.writeObject(reponseClient);
                     }
                     
                     if(requeteClient.getTypetraitement() == RequestDoBigData.ACM)
                     {
                         // Traitement de l'ACM (Faire un objet)
-                        oos.writeObject(reponseClient);
                     }
                     
                     if(requeteClient.getTypetraitement() == RequestDoBigData.REG_CORR)
                     {
                         // Traitement de la REG_CORR (Faire un objet)
-                        oos.writeObject(reponseClient);
                     }
                     if(requeteClient.getTypetraitement() == RequestDoBigData.ANOVA)
                     {
                         // Traitement de la ANOVA (Faire un objet)
-                        oos.writeObject(reponseClient);
                     }
+                    oos.writeObject(reponseClient);
                 }
             }
             
