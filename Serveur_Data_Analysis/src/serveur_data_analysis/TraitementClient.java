@@ -16,11 +16,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.ResourceBundle;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bouncycastle.crypto.Digest;
 
 /**
  *
@@ -68,7 +74,6 @@ public class TraitementClient implements Runnable {
         try {
             while((requeteBaseClient = (BaseRequest) ois.readObject()).getId() != BaseRequest.LOGOUT)
             {
-                reponseClient = new RequestBigDataResult();
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_INITIATOR)
                 {
                     RequestLoginInitiator requeteClient = (RequestLoginInitiator) requeteBaseClient;
@@ -82,7 +87,7 @@ public class TraitementClient implements Runnable {
                     saltClient = Arrays.toString(byteSr);
                     requeteClient.setSaltChallenge(saltClient);
                     
-                    oos.writeObject(reponseClient);
+                    oos.writeObject(requeteClient);
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_EID)
@@ -93,7 +98,7 @@ public class TraitementClient implements Runnable {
                     
                     //Traitement login EID
                     
-                    oos.writeObject(reponseClient);
+                    oos.writeObject(requeteClient);
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_CARTES_A_PUCES)
@@ -104,7 +109,7 @@ public class TraitementClient implements Runnable {
                     
                     //Traitement login carte à puce
                     
-                    oos.writeObject(reponseClient);
+                    oos.writeObject(requeteClient);
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_WEB)
@@ -112,14 +117,45 @@ public class TraitementClient implements Runnable {
                     RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
                     mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement login WEB");
                     System.out.println("Thread :" + this.toString() + "Traitement login WEB");
-                    
+                                        
                     // Traitement login WEB
                     
-                    oos.writeObject(reponseClient);
+                    if(saltClient != null)
+                    {
+                        ResultSet rs = beanJdbc.SelectAllWhere("personnel", "login = \"" + requeteClient.getUsername() + "\"", BeanJDBC.NO_UPDATE); // Le username de la requeteClient (RequestLogin) correspond au login dans la bdd compta table personnel 
+                        try {
+                            if(rs.next())
+                            {
+                                MessageDigest md = MessageDigest.getInstance("SHA-1");
+                                Vector<String> components = new Vector<String>();
+                                components.add(saltClient);
+                                String password = rs.getString("mot de passe");
+                                components.add(password);
+                                if(requeteClient.VerifyDigest(md, components))
+                                {
+                                    requeteClient.setStatus(true);
+                                }
+                                else
+                                    requeteClient.setStatus(false);
+                            }
+                            else
+                                requeteClient.setStatus(false);
+                            
+                        } catch (SQLException ex) {
+                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (NoSuchAlgorithmException ex) {
+                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    else
+                        requeteClient.setStatus(false);
+                    
+                    oos.writeObject(requeteClient);
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.DO_BIG_DATA)
                 {
+                    reponseClient = new RequestBigDataResult();
                     RequestDoBigData requeteClient = (RequestDoBigData) requeteBaseClient;
                     mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement BIG DATA");
                     System.out.println("Thread :" + this.toString() + "Traitement BIG DATA");
