@@ -16,9 +16,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -26,7 +34,6 @@ import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bouncycastle.crypto.Digest;
 
 /**
  *
@@ -97,6 +104,36 @@ public class TraitementClient implements Runnable {
                     System.out.println("Thread :" + this.toString() + "Traitement login EID");
                     
                     //Traitement login EID
+                    if(saltClient != null)
+                    {
+                        ResultSet rs = beanJdbc.SelectAllWhere("personnel", "login = \"" + requeteClient.getUsername() + "\"", BeanJDBC.NO_UPDATE);
+                        try {
+                            if(rs.next())
+                            {
+                                KeyStore ks = KeyStore.getInstance("PKCS11");
+                                // J'ai fait comme Camille ci-dessous mais on doit s'échanger un certif non ? (Dans la partie de Camille Provider pkcs11Provider = new sun.security.pkcs11.SunPKCS11(bais); est en erreur car bias n'est pas de type config)
+                                ks.load(null, null);
+                                X509Certificate certif = (X509Certificate) ks.getCertificate(null);
+                                PublicKey pk = certif.getPublicKey();
+                                Signature s = Signature.getInstance("SHA1withRSA");
+                                s.initVerify(pk);
+                                s.update(saltClient.getBytes());
+                                if(s.verify(requeteClient.getDigest()))
+                                    requeteClient.setStatus(true);
+                                else
+                                    requeteClient.setStatus(false);
+                            }
+                            else
+                                requeteClient.setStatus(false);
+                            
+                        } catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | InvalidKeyException | SQLException | SignatureException ex) {
+                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                        } 
+                    }
+                    else
+                        requeteClient.setStatus(false);
+                    
+                    
                     
                     oos.writeObject(requeteClient);
                 }
@@ -108,6 +145,7 @@ public class TraitementClient implements Runnable {
                     System.out.println("Thread :" + this.toString() + "Traitement login carte à puces");
                     
                     //Traitement login carte à puce
+                    // Dois-je saller ???
                     if(saltClient != null)
                     {
                         ResultSet rs = beanJdbc.SelectAllWhere("personnel", "login = \"" + requeteClient.getUsername() + "\"", BeanJDBC.NO_UPDATE);
@@ -119,10 +157,11 @@ public class TraitementClient implements Runnable {
                                 // Faut-il saller dans ce cas-ci aussi ?? Je ne vois pas qu'il demande ça dans les consignes mais je me dis que si on ne salle pas autant envoyer le message en clair et ne pas faire de digest.
                                 components.add(saltClient);
                                 //Dans ce cas-ci login == username aussi
+                                // Dois-je ajouter tout ça ???
                                 String login = rs.getString("login");
                                 components.add(login);
-                                String code = rs.getString("code");
-                                components.add(code);
+                                String pin = rs.getString("pin");
+                                components.add(pin);
                                 String password = rs.getString("password");
                                 components.add(password);
                                 String cptAcces = rs.getString("compteur acces");
@@ -140,9 +179,7 @@ public class TraitementClient implements Runnable {
                             }
                             else
                                 requeteClient.setStatus(false);
-                        } catch (SQLException ex) {
-                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (NoSuchAlgorithmException ex) {
+                        } catch (SQLException | NoSuchAlgorithmException ex) {
                             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
@@ -203,9 +240,7 @@ public class TraitementClient implements Runnable {
                             else
                                 requeteClient.setStatus(false);
                             
-                        } catch (SQLException ex) {
-                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (NoSuchAlgorithmException ex) {
+                        } catch (SQLException | NoSuchAlgorithmException ex) {
                             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
@@ -251,9 +286,7 @@ public class TraitementClient implements Runnable {
             }
             
             closeConnexion();
-        } catch (IOException ex) {
-            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
