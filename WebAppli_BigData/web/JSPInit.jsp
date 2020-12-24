@@ -45,10 +45,17 @@
                 
                 
                 %><p> You session will be valid until : <%=dateFormatted%> <p><%
- 
                     
-                %><form method="GET" action="/CaddieVirtuel_2/GestionCaddie"> 
-                <P><input type="submit" value="Go fly with TandT !"></P> <!-- Le bt de type submit, va directement apeller la methode specifier au dessus--><%
+                if (username.equalsIgnoreCase("thomas"))
+                {
+                    %><form method="GET" action="/WebAppli_BigData/DoDataMining"> 
+                    <P><input type="submit" value="Go do some datamining !"></P> <!-- Le bt de type submit, va directement apeller la methode specifier au dessus--><%
+                }
+                else //Not a datascientist
+                {
+                    //Call the JSP that pump the data from the server
+                }
+ 
 
                       
                 

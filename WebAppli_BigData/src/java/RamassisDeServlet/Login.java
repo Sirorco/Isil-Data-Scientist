@@ -56,9 +56,8 @@ public class Login extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     
-    private Socket cliSock;
-    private ObjectInputStream ois;
-    private ObjectOutputStream oos;
+    private String port_auth;
+    private String acs_address;
     
     
     public void init (ServletConfig config) throws ServletException 
@@ -72,13 +71,9 @@ public class Login extends HttpServlet {
             Properties propfile=new Properties();
             propfile.load(fip);
 
-            String port_auth = propfile.getProperty("port_serv", "5001");
-            String acs_address = propfile.getProperty("serv_address", "localhost");
+            port_auth = propfile.getProperty("port_serv", "5001");
+            acs_address = propfile.getProperty("serv_address", "localhost");
             
-            cliSock = new Socket(acs_address, Integer.parseInt(port_auth));
-            oos = new ObjectOutputStream(cliSock.getOutputStream());
-            ois = new ObjectInputStream(cliSock.getInputStream());
-            System.out.println ("Server connection OK !");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -94,10 +89,20 @@ public class Login extends HttpServlet {
         Boolean status;
         String  adressejsp;
         
-        
 
-        status = checkLogin (username,pswd);
+        Socket cliSock = new Socket(acs_address, Integer.parseInt(port_auth));
+        ObjectOutputStream oos = new ObjectOutputStream(cliSock.getOutputStream());
+        ObjectInputStream ois = new ObjectInputStream(cliSock.getInputStream());        
+        System.out.println ("Server connection OK !");
+        
+        //On foure les flux dans la session.
+        request.getSession().setAttribute("oos", oos);
+        request.getSession().setAttribute("ois", ois);
+
+        status = checkLogin (username,pswd, oos, ois);
+        
         adressejsp = "/JSPInit.jsp" + "?username=" + URLEncoder.encode(username)  + "&status=" + URLEncoder.encode (status.toString());
+        
 
          
         System.out.println ("Go call the jsp");
@@ -148,7 +153,7 @@ public class Login extends HttpServlet {
     }// </editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="Our methodes and fonctions (J'ai trouvé comment faire des régions en java[c'est quand même plus facile avec C#])">
-    synchronized boolean checkLogin (String Username, String pswd)
+    synchronized boolean checkLogin (String Username, String pswd, ObjectOutputStream oos, ObjectInputStream ois)
     {
 
         try
@@ -156,8 +161,6 @@ public class Login extends HttpServlet {
             //Todo : getsalt from server
             RequestLoginInitiator reqloginit = new RequestLoginInitiator();
             reqloginit.setId(BaseRequest.LOGIN_INITIATOR);
-            reqloginit.setStatus(true);
-            reqloginit.setError_msg(null);
             reqloginit.setSaltChallenge(Username);
 
             oos.writeObject(reqloginit);
@@ -167,8 +170,6 @@ public class Login extends HttpServlet {
 
             RequestLogin reqlog = new RequestLogin();
             reqlog.setId(BaseRequest.LOGIN_WEB);
-            reqlog.setStatus(true);
-            reqlog.setError_msg(null);
             reqlog.setUsername(Username);
         
             System.out.println("Instanciation du message digest");
