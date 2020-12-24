@@ -12,6 +12,7 @@ package Protocol;
  */
 public class BaseRequest {
     //Requests IDs
+    public static final int NOT_SET = -1;
     public static final int LOGIN_INITIATOR = 0;
     public static final int LOGIN_EID = 1;
     public static final int LOGIN_CARTES_A_PUCES = 2;
@@ -24,6 +25,20 @@ public class BaseRequest {
     private int id;
     private boolean status;
     private String error_msg;
+    
+    BaseRequest()
+    {
+        id = NOT_SET;
+        status = true;
+        error_msg = null;
+    }
+    
+    BaseRequest(int IDp, boolean statusp, String errorp)
+    {
+        setId(IDp);
+        setStatus(statusp);
+        setError_msg(errorp);
+    }
     
     /**
      * @return the id
