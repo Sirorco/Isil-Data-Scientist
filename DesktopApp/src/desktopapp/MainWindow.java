@@ -19,6 +19,7 @@ public class MainWindow extends javax.swing.JFrame {
     private Socket socket;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
+    private boolean isDataScientist;
     
     /**
      * Creates new form MainWindow
@@ -65,6 +66,11 @@ public class MainWindow extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    void setDataScientist(boolean isdatascientist) {
+        isDataScientist = isdatascientist;
+        //TO DO: ENABLE TAB
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

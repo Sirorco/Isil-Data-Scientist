@@ -8,6 +8,8 @@ package desktopapp;
 import Protocol.BaseRequest;
 import Protocol.RequestLogin;
 import Protocol.RequestLoginInitiator;
+import Protocol.RequestLoginResponse;
+import Protocol.RequestLogineID;
 import Utils.Cards.CartePuceApplet;
 import com.sun.javacard.apduio.Apdu;
 import com.sun.javacard.apduio.CadClient;
@@ -88,7 +90,6 @@ public class LoginDialog extends javax.swing.JDialog {
         loginText = new javax.swing.JTextField();
         okButton = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Login");
 
         jLabel1.setText("Moyen de login:");
@@ -285,14 +286,18 @@ public class LoginDialog extends javax.swing.JDialog {
         s.initSign(cle);
         s.update(challenge.getBytes());
         
-        RequestLogin req = new RequestLogin();
+        RequestLogineID req = new RequestLogineID();
         req.setId(BaseRequest.LOGIN_EID);
         req.setUsername(loginText.getText());
         req.setDigest(s.sign());
+        req.seteIDcertificate(idKs.getCertificate("Signature"));
         
         outputStream.writeObject(req);
-        req = (RequestLogin)inputStream.readObject();
-        ok = req.getStatus();
+        RequestLoginResponse resp = (RequestLoginResponse)inputStream.readObject();
+        
+        MainWindow parent  = (MainWindow) getParent();
+        parent.setDataScientist(resp.isIsdatascientist());
+        ok = resp.getStatus();
     }
     
     private boolean sendLoginPuce(Vector<String> values) throws NoSuchAlgorithmException, IOException, ClassNotFoundException
@@ -305,7 +310,10 @@ public class LoginDialog extends javax.swing.JDialog {
         req.CalculateDigest(md, values);
         
         outputStream.writeObject(req);
-        req = (RequestLogin)inputStream.readObject();
+        RequestLoginResponse resp = (RequestLoginResponse)inputStream.readObject();
+        
+        MainWindow parent  = (MainWindow) getParent();
+        parent.setDataScientist(resp.isIsdatascientist());
         return req.getStatus();
     }
 }

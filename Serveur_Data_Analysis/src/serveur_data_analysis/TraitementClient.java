@@ -69,6 +69,13 @@ public class TraitementClient implements Runnable {
         String name = bundle.getString("sgbd.name");
         String user = bundle.getString("sgbd.user");
         String mdp = bundle.getString("sgbd.mdp");
+        
+        //Chargement du driver de MYSQL
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         beanJdbc = new BeanJDBC(name, user, mdp);
         
     }
