@@ -37,7 +37,10 @@ tester avec le script de test:
 java_card_kit-2_2_1\bin\apdutool.bat -o carteAPuces\testScript.log carteAPuces\testScript.scr
 
 lancer emulateur pour les tests :
-java_card_kit-2_2_1\bin\cref.exe -i carteAPuces\eepromCartePuce -o path/to/output/eeprom
+java_card_kit-2_2_1\bin\cref.exe -i carteAPuces\eepromCartePuce -o path\to\output\eeprom
 
 l'eepromCartePuce est 'vierge' : l'applet est installée, le compteur est à 0
 Essayez de ne pas la modifier en la passant à l'option -o, comme ça on a toujours une eeprom de départ :)
+
+pin eepromCartePuce : 1234
+pin eepromCartePuce2: 5678
