@@ -26,14 +26,14 @@ public class BaseRequest {
     private boolean status;
     private String error_msg;
     
-    BaseRequest()
+    public BaseRequest()
     {
         id = NOT_SET;
-        status = true;
+        status = false;
         error_msg = null;
     }
     
-    BaseRequest(int IDp, boolean statusp, String errorp)
+    public BaseRequest(int IDp, boolean statusp, String errorp)
     {
         setId(IDp);
         setStatus(statusp);
