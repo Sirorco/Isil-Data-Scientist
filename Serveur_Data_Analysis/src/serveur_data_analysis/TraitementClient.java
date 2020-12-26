@@ -104,6 +104,8 @@ public class TraitementClient implements Runnable {
                     saltClient = Arrays.toString(byteSr);
                     reponseClient = new RequestLoginInitiator();
                     ((RequestLoginInitiator)reponseClient).setSaltChallenge(saltClient);
+                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Sallage construit !");
+                    System.out.println("Thread :" + this.toString() + "Sallage construit !");
                     reponseClient.setStatus(true);
                 }
                 
@@ -138,6 +140,9 @@ public class TraitementClient implements Runnable {
                                 else
                                     ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
                                 reponseClient.setStatus(true);
+                                
+                                mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
+                                System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
                             }
                                 
                             else
@@ -148,6 +153,12 @@ public class TraitementClient implements Runnable {
                     }
                     else
                         reponseClient.setStatus(false);
+                    
+                    if(!reponseClient.getStatus())
+                    {
+                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne non authentifiée !");
+                        System.out.println("Thread :" + this.toString() + "Personne non authentifiée !");
+                    }
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_CARTES_A_PUCES)
@@ -167,16 +178,8 @@ public class TraitementClient implements Runnable {
                             {
                                 MessageDigest md = MessageDigest.getInstance("SHA-256");
                                 Vector<String> components = new Vector<String>();
-                                // Faut-il saller dans ce cas-ci aussi ?? Je ne vois pas qu'il demande ça dans les consignes mais je me dis que si on ne salle pas autant envoyer le message en clair et ne pas faire de digest.
-                                components.add(saltClient);
-                                //Dans ce cas-ci login == username aussi
-                                // Dois-je ajouter tout ça ???
-                                String login = rs.getString("login");
-                                components.add(login);
                                 String pin = rs.getString("pin");
                                 components.add(pin);
-                                String password = rs.getString("password");
-                                components.add(password);
                                 String cptAcces = rs.getString("compteur acces");
                                 components.add(cptAcces);
                                 if(requeteClient.VerifyDigest(md, components))
@@ -191,6 +194,8 @@ public class TraitementClient implements Runnable {
                                     
                                     // Mise à jour de la bdd pour l'incrémentation du compteur d'accès! 
                                     beanJdbc.Update("personnel", "login = \"" + requeteClient.getUsername() + "\"", "compteur acces", Integer.toString(tempCptAcces));
+                                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
+                                    System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
                                     
                                     reponseClient.setStatus(true);
                                 }
@@ -205,6 +210,11 @@ public class TraitementClient implements Runnable {
                     }
                     else
                         reponseClient.setStatus(false);
+                    if(!reponseClient.getStatus())
+                    {
+                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne non authentifiée !");
+                        System.out.println("Thread :" + this.toString() + "Personne non authentifiée !");
+                    }
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_OTP)
@@ -235,6 +245,9 @@ public class TraitementClient implements Runnable {
                                   else
                                     ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
                                   reponseClient.setStatus(true);
+                                  
+                                  mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
+                                  System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
                               }
                               else
                                   reponseClient.setStatus(false);
@@ -249,6 +262,12 @@ public class TraitementClient implements Runnable {
                     }
                     else
                         reponseClient.setStatus(false);
+                    
+                    if(!reponseClient.getStatus())
+                    {
+                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne non authentifiée !");
+                        System.out.println("Thread :" + this.toString() + "Personne non authentifiée !");
+                    }
                 }
                                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_WEB)
@@ -278,6 +297,9 @@ public class TraitementClient implements Runnable {
                                     else
                                         ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
                                     
+                                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
+                                    System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
+                                    
                                     reponseClient.setStatus(true);
                                 }
                                     
@@ -293,6 +315,11 @@ public class TraitementClient implements Runnable {
                     }
                     else
                         reponseClient.setStatus(false);
+                    if(!reponseClient.getStatus())
+                    {
+                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne non authentifiée !");
+                        System.out.println("Thread :" + this.toString() + "Personne non authentifiée !");
+                    }
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.DO_BIG_DATA)
