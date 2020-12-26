@@ -14,7 +14,7 @@ import java.util.Vector;
  * @author Thomas
  */
 public class RequestLogin extends BaseRequest {
-    
+
     private String username;
     private byte[] digest;
 
