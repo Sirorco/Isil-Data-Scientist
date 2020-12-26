@@ -11,14 +11,34 @@ import Protocol.RequestBigDataResult;
 import Protocol.RequestDoBigData;
 import Protocol.RequestLogin;
 import Protocol.RequestLoginInitiator;
+import Protocol.RequestLoginResponse;
+import Protocol.RequestLogineID;
 import connectionJdbc.BeanJDBC;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.ResourceBundle;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.X509TrustManager;
 
 /**
  *
@@ -58,61 +78,219 @@ public class TraitementClient implements Runnable {
     public void run() {
         mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Lancement du thread de traitement client !");
         System.out.println("Thread :" + this.toString() + "Lancement du thread de traitement client !");
-        boolean finConnexion = false;
-        BaseRequest requeteBaseClient;
-        BaseRequest reponseClient;
-        
+        BaseRequest requeteBaseClient = null;
+        BaseRequest reponseClient = null;
+        String saltClient = null;
         
         try {
             while((requeteBaseClient = (BaseRequest) ois.readObject()).getId() != BaseRequest.LOGOUT)
-            {
-                reponseClient = new RequestBigDataResult();
+            {                         
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_INITIATOR)
                 {
-                    RequestLoginInitiator requeteClient = (RequestLoginInitiator) requeteBaseClient;
                     mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement initialisation login");
                     System.out.println("Thread :" + this.toString() + "Traitement initialisation login");
                     
                     // Traitement initialisation login
-                    
-                    oos.writeObject(reponseClient);
+                    SecureRandom sr = new SecureRandom();
+                    byte[] byteSr = new byte[256];
+                    sr.nextBytes(byteSr);
+                    saltClient = Arrays.toString(byteSr);
+                    reponseClient = new RequestLoginInitiator();
+                    ((RequestLoginInitiator)reponseClient).setSaltChallenge(saltClient);
+                    reponseClient.setStatus(true);
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_EID)
                 {
-                    RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
+                    reponseClient = new RequestLoginResponse();
+                    RequestLogineID requeteClient = (RequestLogineID) requeteBaseClient;
                     mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement login EID");
                     System.out.println("Thread :" + this.toString() + "Traitement login EID");
                     
                     //Traitement login EID
+                    if(saltClient != null)
+                    {
+                        ResultSet rs = beanJdbc.SelectAllWhere("personnel", "login = \"" + requeteClient.getUsername() + "\"", BeanJDBC.NO_UPDATE);
+                        if(rs.next())
+                        {
+                            // Vérification avec le CA ??
+                            X509Certificate certif = (X509Certificate) requeteClient.geteIDcertificate();
+                            try {
+                                certif.checkValidity();
+                            } catch (CertificateExpiredException | CertificateNotYetValidException ex) {
+                                Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            PublicKey pk = certif.getPublicKey();
+                            Signature s = Signature.getInstance("SHA1withRSA");
+                            s.initVerify(pk);
+                            s.update(saltClient.getBytes());
+                            if(s.verify(requeteClient.getDigest()))
+                            {
+                                if(rs.getString("isDatascientist").equalsIgnoreCase("true"))
+                                    ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
+                                else
+                                    ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
+                                reponseClient.setStatus(true);
+                            }
+                                
+                            else
+                                reponseClient.setStatus(false);
+                        }
+                        else
+                            reponseClient.setStatus(false); 
+                    }
+                    else
+                        reponseClient.setStatus(false);
+                }
+                
+                if(requeteBaseClient.getId() == BaseRequest.LOGIN_CARTES_A_PUCES)
+                {
+                    reponseClient = new RequestLoginResponse();
+                    RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
+                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement login carte à puces");
+                    System.out.println("Thread :" + this.toString() + "Traitement login carte à puces");
                     
-                    oos.writeObject(reponseClient);
+                    //Traitement login carte à puce
+                    // Dois-je saller ???
+                    if(saltClient != null)
+                    {
+                        ResultSet rs = beanJdbc.SelectAllWhere("personnel", "login = \"" + requeteClient.getUsername() + "\"", BeanJDBC.NO_UPDATE);
+                        try {
+                            if(rs.next())
+                            {
+                                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                                Vector<String> components = new Vector<String>();
+                                // Faut-il saller dans ce cas-ci aussi ?? Je ne vois pas qu'il demande ça dans les consignes mais je me dis que si on ne salle pas autant envoyer le message en clair et ne pas faire de digest.
+                                components.add(saltClient);
+                                //Dans ce cas-ci login == username aussi
+                                // Dois-je ajouter tout ça ???
+                                String login = rs.getString("login");
+                                components.add(login);
+                                String pin = rs.getString("pin");
+                                components.add(pin);
+                                String password = rs.getString("password");
+                                components.add(password);
+                                String cptAcces = rs.getString("compteur acces");
+                                components.add(cptAcces);
+                                if(requeteClient.VerifyDigest(md, components))
+                                {
+                                    int tempCptAcces = Integer.parseInt(cptAcces);
+                                    tempCptAcces++;
+                                    
+                                    if(rs.getString("isDatascientist").equalsIgnoreCase("true"))
+                                        ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
+                                    else
+                                        ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
+                                    
+                                    // Mise à jour de la bdd pour l'incrémentation du compteur d'accès! 
+                                    beanJdbc.Update("personnel", "login = \"" + requeteClient.getUsername() + "\"", "compteur acces", Integer.toString(tempCptAcces));
+                                    
+                                    reponseClient.setStatus(true);
+                                }
+                                else
+                                    reponseClient.setStatus(false);
+                            }
+                            else
+                                reponseClient.setStatus(false);
+                        } catch (SQLException | NoSuchAlgorithmException ex) {
+                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    else
+                        reponseClient.setStatus(false);
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_OTP)
                 {
+                    reponseClient = new RequestLoginResponse();
                     RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
-                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement login OTP");
-                    System.out.println("Thread :" + this.toString() + "Traitement login OTP");
+                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Création de l'otp");
+                    System.out.println("Thread :" + this.toString() + "Création de l'otp");
                     
-                    //Traitement login OTP
-                    
-                    oos.writeObject(reponseClient);
+                    //Création de l'otp
+                    if(saltClient != null)
+                    {
+                        ResultSet rs = beanJdbc.SelectAllWhere("personnel", "login = \"" + requeteClient.getUsername() + "\"", BeanJDBC.NO_UPDATE); // Le username de la requeteClient (RequestLogin) correspond au login dans la bdd compta table personnel
+                        try {
+                            if(rs.next())
+                            {
+                              MessageDigest md = MessageDigest.getInstance("SHA-256");
+                              Vector<String> components = new Vector<String>();
+                              components.add(saltClient);
+                              String login = rs.getString("login");
+                              components.add(login);
+                              String pin = rs.getString("pin");
+                              components.add(pin);
+                              if(requeteClient.VerifyDigest(md, components))
+                              {
+                                  if(rs.getString("isDatascientist").equalsIgnoreCase("true"))
+                                    ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
+                                  else
+                                    ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
+                                  reponseClient.setStatus(true);
+                              }
+                              else
+                                  reponseClient.setStatus(false);
+                            }
+                            else
+                                reponseClient.setStatus(false);
+                        } catch (SQLException ex) {
+                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (NoSuchAlgorithmException ex) {
+                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    else
+                        reponseClient.setStatus(false);
                 }
-                
+                                
                 if(requeteBaseClient.getId() == BaseRequest.LOGIN_WEB)
                 {
+                    reponseClient = new RequestLoginResponse();
                     RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
                     mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement login WEB");
                     System.out.println("Thread :" + this.toString() + "Traitement login WEB");
-                    
+                                        
                     // Traitement login WEB
                     
-                    oos.writeObject(reponseClient);
+                    if(saltClient != null)
+                    {
+                        ResultSet rs = beanJdbc.SelectAllWhere("personnel", "login = \"" + requeteClient.getUsername() + "\"", BeanJDBC.NO_UPDATE); // Le username de la requeteClient (RequestLogin) correspond au login dans la bdd compta table personnel 
+                        try {
+                            if(rs.next())
+                            {
+                                MessageDigest md = MessageDigest.getInstance("SHA-1");
+                                Vector<String> components = new Vector<String>();
+                                components.add(saltClient);
+                                String password = rs.getString("mot de passe");
+                                components.add(password);
+                                if(requeteClient.VerifyDigest(md, components))
+                                {
+                                    if(rs.getString("isDatascientist").equalsIgnoreCase("true"))
+                                        ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
+                                    else
+                                        ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
+                                    
+                                    reponseClient.setStatus(true);
+                                }
+                                    
+                                else
+                                    reponseClient.setStatus(false);
+                            }
+                            else
+                                reponseClient.setStatus(false);
+                            
+                        } catch (SQLException | NoSuchAlgorithmException ex) {
+                            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    else
+                        reponseClient.setStatus(false);
                 }
                 
                 if(requeteBaseClient.getId() == BaseRequest.DO_BIG_DATA)
                 {
+                    reponseClient = new RequestBigDataResult();
                     RequestDoBigData requeteClient = (RequestDoBigData) requeteBaseClient;
                     mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement BIG DATA");
                     System.out.println("Thread :" + this.toString() + "Traitement BIG DATA");
@@ -120,35 +298,39 @@ public class TraitementClient implements Runnable {
                     //Traitement BIG DATA
                     
                     
-                    if(requeteClient.getTypetraitement() == RequestDoBigData.ACP)
+                    if(requeteClient.getTypetraitement() == RequestDoBigData.CAH)
                     {
-                        // Traitement de l'ACP (Faire un objet)
-                        oos.writeObject(reponseClient);
+                        // Traitement du CAH (Faire un objet)
                     }
                     
                     if(requeteClient.getTypetraitement() == RequestDoBigData.ACM)
                     {
                         // Traitement de l'ACM (Faire un objet)
-                        oos.writeObject(reponseClient);
                     }
                     
                     if(requeteClient.getTypetraitement() == RequestDoBigData.REG_CORR)
                     {
                         // Traitement de la REG_CORR (Faire un objet)
-                        oos.writeObject(reponseClient);
                     }
                     if(requeteClient.getTypetraitement() == RequestDoBigData.ANOVA)
                     {
                         // Traitement de la ANOVA (Faire un objet)
-                        oos.writeObject(reponseClient);
                     }
                 }
+                oos.writeObject(reponseClient);
             }
+        
             
             closeConnexion();
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
+            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SignatureException ex) {
+            Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
