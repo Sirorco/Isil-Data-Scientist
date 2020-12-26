@@ -33,7 +33,7 @@ public class BaseRequest {
         error_msg = null;
     }
     
-    BaseRequest(int IDp, boolean statusp, String errorp)
+    public BaseRequest(int IDp, boolean statusp, String errorp)
     {
         setId(IDp);
         setStatus(statusp);
