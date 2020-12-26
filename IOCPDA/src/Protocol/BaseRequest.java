@@ -26,10 +26,10 @@ public class BaseRequest {
     private boolean status;
     private String error_msg;
     
-    BaseRequest()
+    public BaseRequest()
     {
         id = NOT_SET;
-        status = true;
+        status = false;
         error_msg = null;
     }
     
