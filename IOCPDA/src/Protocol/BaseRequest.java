@@ -12,19 +12,33 @@ package Protocol;
  */
 public class BaseRequest {
     //Requests IDs
+    public static final int NOT_SET = -1;
     public static final int LOGIN_INITIATOR = 0;
     public static final int LOGIN_EID = 1;
     public static final int LOGIN_CARTES_A_PUCES = 2;
-    public static final int LOGIN_CREATE_OTP = 3;
-    public static final int LOGIN_VERIFY_OTP = 4;
-    public static final int LOGIN_WEB = 5;
-    public static final int DO_BIG_DATA = 6;
-    public static final int BIG_DATA_RESULT = 7;
-    public static final int LOGOUT = 8;
+    public static final int LOGIN_OTP = 3;
+    public static final int LOGIN_WEB = 4;
+    public static final int DO_BIG_DATA = 5;
+    public static final int BIG_DATA_RESULT = 6;
+    public static final int LOGOUT = 7;
     
     private int id;
     private boolean status;
     private String error_msg;
+    
+    public BaseRequest()
+    {
+        id = NOT_SET;
+        status = false;
+        error_msg = null;
+    }
+    
+    public BaseRequest(int IDp, boolean statusp, String errorp)
+    {
+        setId(IDp);
+        setStatus(statusp);
+        setError_msg(errorp);
+    }
     
     /**
      * @return the id
