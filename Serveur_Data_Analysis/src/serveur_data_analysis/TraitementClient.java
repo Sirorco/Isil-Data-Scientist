@@ -178,10 +178,11 @@ public class TraitementClient implements Runnable {
                                     ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
                                 }
 
-                                // Mise à jour de la bdd pour l'incrémentation du compteur d'accès! ATTENTION VERIFIER L'ERREUR !!!!
                                 beanJdbc.Update("personnel", "login = \"" + requeteClient.getUsername() + "\"", "compteurAcces", Integer.toString(tempCptAcces));
-                                mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
-                                System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
+                                mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + " Personne authentifiée !");
+                                System.out.println("Thread :" + this.toString() + " Personne authentifiée !");
+                                mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + " Compteur d'accès mis à jour : " + Integer.toString(tempCptAcces));
+                                System.out.println("Thread :" + this.toString() + " Compteur d'accès mis à jour : " + Integer.toString(tempCptAcces));
 
                                 reponseClient.setStatus(true);
                             } else {
@@ -194,8 +195,8 @@ public class TraitementClient implements Runnable {
                         Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     if (!reponseClient.getStatus()) {
-                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne non authentifiée !");
-                        System.out.println("Thread :" + this.toString() + "Personne non authentifiée !");
+                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + " Personne non authentifiée !");
+                        System.out.println("Thread :" + this.toString() + " Personne non authentifiée !");
                     }
                 }
 
