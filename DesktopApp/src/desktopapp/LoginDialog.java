@@ -314,6 +314,6 @@ public class LoginDialog extends javax.swing.JDialog {
         
         MainWindow parent  = (MainWindow) getParent();
         parent.setDataScientist(resp.isIsdatascientist());
-        return req.getStatus();
+        return resp.getStatus();
     }
 }

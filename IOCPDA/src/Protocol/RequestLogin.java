@@ -54,7 +54,7 @@ public class RequestLogin extends BaseRequest {
         while (Components.size()!=0)
         {
             md.update(Components.firstElement().getBytes());
-            Components.remove(1);
+            Components.remove(0);
         }
             this.setDigest(md.digest());
     }
