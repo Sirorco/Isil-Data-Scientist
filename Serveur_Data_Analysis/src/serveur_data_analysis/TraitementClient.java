@@ -13,6 +13,7 @@ import Protocol.RequestLoginInitiator;
 import Protocol.RequestLoginResponse;
 import Protocol.RequestLogineID;
 import connectionJdbc.BeanJDBC;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,10 +23,12 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -113,30 +116,45 @@ public class TraitementClient implements Runnable {
                     if (saltClient != null) {
                         ResultSet rs = beanJdbc.SelectAllWhere("personnel", "login = \"" + requeteClient.getUsername() + "\"", BeanJDBC.NO_UPDATE);
                         if (rs.next()) {
-                            // Vérification avec le CA ??
                             X509Certificate certif = (X509Certificate) requeteClient.geteIDcertificate();
+                            
                             try {
                                 certif.checkValidity();
+                                
+                                //verifiction avec le CA:
+                                KeyStore ks = KeyStore.getInstance("JKS");
+                                ks.load(new FileInputStream("EID\\CitizenCAKeystore.jks"), "password".toCharArray());
+                                Certificate certCA = ks.getCertificate("citizenca");
+                                PublicKey pubKCA = certCA.getPublicKey();
+                                certif.verify(pubKCA);
+                                
+                                //vérification signature
+                                PublicKey pk = certif.getPublicKey();
+                                Signature s = Signature.getInstance("SHA1withRSA");
+                                s.initVerify(pk);
+                                s.update(saltClient.getBytes());
+                                if (s.verify(requeteClient.getDigest())) {
+                                    if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
+                                        ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
+                                    } else {
+                                        ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
+                                    }
+                                    reponseClient.setStatus(true);
+
+                                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
+                                    System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
+                                } else {
+                                    reponseClient.setStatus(false);
+                                }
+                                
                             } catch (CertificateExpiredException | CertificateNotYetValidException ex) {
                                 Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                            PublicKey pk = certif.getPublicKey();
-                            Signature s = Signature.getInstance("SHA1withRSA");
-                            s.initVerify(pk);
-                            s.update(saltClient.getBytes());
-                            if (s.verify(requeteClient.getDigest())) {
-                                if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
-                                    ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
-                                } else {
-                                    ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
-                                }
-                                reponseClient.setStatus(true);
-
-                                mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
-                                System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
-                            } else {
+                                reponseClient.setStatus(false);
+                            } catch (CertificateException | NoSuchProviderException | KeyStoreException ex) {
+                                Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
                                 reponseClient.setStatus(false);
                             }
+
                         } else {
                             reponseClient.setStatus(false);
                         }

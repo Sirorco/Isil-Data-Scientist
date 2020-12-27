@@ -31,6 +31,7 @@ public class DesktopApp {
             if(window.login())
                 window.setVisible(true);
             
+            window.stop();
             System.exit(0);
         }
         catch (IOException ex) {

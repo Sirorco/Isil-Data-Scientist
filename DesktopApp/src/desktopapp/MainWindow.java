@@ -5,6 +5,7 @@
  */
 package desktopapp;
 
+import Protocol.BaseRequest;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -40,6 +41,16 @@ public class MainWindow extends javax.swing.JFrame {
         LoginDialog dialog = new LoginDialog(this,true,inputStream,outputStream);
         dialog.setVisible(true);
         return dialog.isOk();
+    }
+    
+    public void stop() throws IOException
+    {
+        BaseRequest req = new BaseRequest();
+        req.setId(BaseRequest.LOGOUT);
+        
+        outputStream.writeObject(req);
+        
+        socket.close();
     }
 
     /**
