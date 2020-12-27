@@ -164,7 +164,7 @@ public class TraitementClient implements Runnable {
                             Vector<String> components = new Vector<String>();
                             String pin = rs.getString("pin");
                             components.add(pin);
-                            String cptAcces = rs.getString("compteur acces");
+                            String cptAcces = rs.getString("compteurAcces");
                             mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + " Compteur d'accès = " + cptAcces);
                             System.out.println("Thread :" + this.toString() + " Compteur d'accès = " + cptAcces);
                             components.add(cptAcces);
@@ -179,7 +179,7 @@ public class TraitementClient implements Runnable {
                                 }
 
                                 // Mise à jour de la bdd pour l'incrémentation du compteur d'accès! ATTENTION VERIFIER L'ERREUR !!!!
-                                //beanJdbc.Update("personnel", "login = \"" + requeteClient.getUsername() + "\"", "compteur acces", Integer.toString(tempCptAcces));
+                                beanJdbc.Update("personnel", "login = \"" + requeteClient.getUsername() + "\"", "compteurAcces", Integer.toString(tempCptAcces));
                                 mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
                                 System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
 
@@ -262,7 +262,7 @@ public class TraitementClient implements Runnable {
                                 MessageDigest md = MessageDigest.getInstance("SHA-1");
                                 Vector<String> components = new Vector<String>();
                                 components.add(saltClient);
-                                String password = rs.getString("mot de passe");
+                                String password = rs.getString("motDePasse");
                                 components.add(password);
                                 if (requeteClient.VerifyDigest(md, components)) {
                                     if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
