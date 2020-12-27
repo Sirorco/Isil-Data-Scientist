@@ -13,23 +13,17 @@ import Protocol.RequestLoginInitiator;
 import Protocol.RequestLoginResponse;
 import Protocol.RequestLogineID;
 import connectionJdbc.BeanJDBC;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -40,7 +34,6 @@ import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.X509TrustManager;
 
 /**
  *
@@ -121,36 +114,31 @@ public class TraitementClient implements Runnable {
                             try {
                                 certif.checkValidity();
                                 
-                                //verifiction avec le CA:
-                                KeyStore ks = KeyStore.getInstance("JKS");
-                                ks.load(new FileInputStream("EID\\CitizenCAKeystore.jks"), "password".toCharArray());
-                                Certificate certCA = ks.getCertificate("citizenca");
-                                PublicKey pubKCA = certCA.getPublicKey();
-                                certif.verify(pubKCA);
-                                
-                                //vérification signature
-                                PublicKey pk = certif.getPublicKey();
-                                Signature s = Signature.getInstance("SHA1withRSA");
-                                s.initVerify(pk);
-                                s.update(saltClient.getBytes());
-                                if (s.verify(requeteClient.getDigest())) {
-                                    if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
-                                        ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
-                                    } else {
-                                        ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
-                                    }
-                                    reponseClient.setStatus(true);
+                                if(checkOCSP(certif))
+                                {
+                                    //vérification signature
+                                    PublicKey pk = certif.getPublicKey();
+                                    Signature s = Signature.getInstance("SHA1withRSA");
+                                    s.initVerify(pk);
+                                    s.update(saltClient.getBytes());
+                                    if (s.verify(requeteClient.getDigest())) {
+                                        if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
+                                            ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
+                                        } else {
+                                            ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
+                                        }
+                                        reponseClient.setStatus(true);
 
-                                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
-                                    System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
-                                } else {
-                                    reponseClient.setStatus(false);
+                                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
+                                        System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
+                                    } else {
+                                        reponseClient.setStatus(false);
+                                    }
                                 }
+                                else
+                                    reponseClient.setStatus(false);
                                 
                             } catch (CertificateExpiredException | CertificateNotYetValidException ex) {
-                                Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
-                                reponseClient.setStatus(false);
-                            } catch (CertificateException | NoSuchProviderException | KeyStoreException ex) {
                                 Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
                                 reponseClient.setStatus(false);
                             }
@@ -362,6 +350,10 @@ public class TraitementClient implements Runnable {
         } catch (IOException ex) {
             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private boolean checkOCSP(X509Certificate certif) {
+        return true;
     }
 
 }
