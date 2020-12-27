@@ -12,8 +12,10 @@ package RamassisDeServlet;
 */
 
 import Protocol.BaseRequest;
+import static Protocol.BaseRequest.LOGOUT;
 import Protocol.RequestLogin;
 import Protocol.RequestLoginInitiator;
+import Protocol.RequestLoginResponse;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -95,13 +97,41 @@ public class Login extends HttpServlet {
         ObjectInputStream ois = new ObjectInputStream(cliSock.getInputStream());        
         System.out.println ("Server connection OK !");
         
-        //On foure les flux dans la session.
-        request.getSession().setAttribute("oos", oos);
-        request.getSession().setAttribute("ois", ois);
+        
 
-        status = checkLogin (username,pswd, oos, ois);
+
+        int returnval =checkLogin (username,pswd, oos, ois);
+        
+        
+        if (returnval<1) //Bad login, we kill the connection
+        {
+            BaseRequest end = new BaseRequest(LOGOUT, false, null);
+            oos.writeObject(end);
+            
+            ois.close();
+            oos.close();
+            status = false;
+        }
+        else
+        {
+            //On foure les flux dans la session.
+            request.getSession().setAttribute("oos", oos);
+            request.getSession().setAttribute("ois", ois);
+            
+            status = true;
+            
+            if (returnval == 1)
+            {
+                request.getSession().setAttribute("isdatascientist",false);
+            }
+            else
+            {
+                request.getSession().setAttribute("isdatascientist",true);
+            }
+        }
         
         adressejsp = "/JSPInit.jsp" + "?username=" + URLEncoder.encode(username)  + "&status=" + URLEncoder.encode (status.toString());
+
         
 
          
@@ -153,7 +183,11 @@ public class Login extends HttpServlet {
     }// </editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="Our methodes and fonctions (J'ai trouvé comment faire des régions en java[c'est quand même plus facile avec C#])">
-    synchronized boolean checkLogin (String Username, String pswd, ObjectOutputStream oos, ObjectInputStream ois)
+    // -1 => error somewhere
+    // 0 => Bad login
+    // 1 => Good login but not datascientist
+    // 2 => Good login and datascientist
+    int checkLogin (String Username, String pswd, ObjectOutputStream oos, ObjectInputStream ois)
     {
 
         try
@@ -182,9 +216,23 @@ public class Login extends HttpServlet {
             oos.writeObject(reqlog);
             oos.flush();
             
-            BaseRequest basreq = (BaseRequest) ois.readObject();
+            RequestLoginResponse logrep = (RequestLoginResponse) ois.readObject();
             
-            return basreq.getStatus(); //True if login success
+            if (logrep.getStatus() == false)
+            {
+                return 0; //bad login
+            }
+            else
+            {
+                if (logrep.isIsdatascientist())
+                {
+                    return 2; //datascientist
+                }
+                else
+                {
+                    return 1; //not datascientist
+                }
+            }
             
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
@@ -195,7 +243,7 @@ public class Login extends HttpServlet {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return false;
+        return -1;
     }
     // </editor-fold>
 

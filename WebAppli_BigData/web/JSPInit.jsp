@@ -46,14 +46,18 @@
                 
                 %><p> You session will be valid until : <%=dateFormatted%> <p><%
                     
-                if (username.equalsIgnoreCase("thomas"))
+                if ((boolean)session.getAttribute("isdatascientist") == true)
                 {
-                    %><form method="GET" action="/WebAppli_BigData/DoDataMining"> 
+                    %> <h4>You are datascientist !</h4><%
+                    %><form method="GET" action="/WebAppli_BigData/DataMiningMenu"> 
                     <P><input type="submit" value="Go do some datamining !"></P> <!-- Le bt de type submit, va directement apeller la methode specifier au dessus--><%
                 }
                 else //Not a datascientist
                 {
                     //Call the JSP that pump the data from the server
+                    %> <h4>You aren't a datascientist !</h4><%
+                    %><form method="GET" action="/WebAppli_BigData/DataMiningMenu"> 
+                    <P><input type="submit" value="Go do some datamining !"></P> <!-- Le bt de type submit, va directement apeller la methode specifier au dessus--><%
                 }
  
 
