@@ -5,12 +5,14 @@
  */
 package Protocol;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Thomas
  * IOCPDA : Input Output Container Platform Data Analyse
  */
-public class BaseRequest {
+public class BaseRequest implements Serializable {
     //Requests IDs
     public static final int NOT_SET = -1;
     public static final int LOGIN_INITIATOR = 0;
@@ -26,14 +28,14 @@ public class BaseRequest {
     private boolean status;
     private String error_msg;
     
-    BaseRequest()
+    public BaseRequest()
     {
         id = NOT_SET;
-        status = true;
+        status = false;
         error_msg = null;
     }
     
-    BaseRequest(int IDp, boolean statusp, String errorp)
+    public BaseRequest(int IDp, boolean statusp, String errorp)
     {
         setId(IDp);
         setStatus(statusp);

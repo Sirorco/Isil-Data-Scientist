@@ -11,7 +11,7 @@ package Protocol;
  */
 public class RequestDoBigData extends BaseRequest {
 
-    public static final int ACP = 0;
+    public static final int CAH = 0;
     public static final int ACM = 1;
     public static final int REG_CORR = 2;
     public static final int ANOVA = 3;
