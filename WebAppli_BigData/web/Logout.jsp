@@ -21,13 +21,20 @@
             
             ObjectOutputStream oos = (ObjectOutputStream)session.getAttribute ("oos");
             ObjectInputStream ois = (ObjectInputStream)session.getAttribute ("ois");
+            
+            System.out.println ("Get the streams");
 
             BaseRequest end = new BaseRequest(BaseRequest.LOGOUT, false, null);
             oos.writeObject(end);
+            oos.flush();
+            
+            System.out.println ("Send kill");
             
             ois.close();
             oos.close();
  
         %>
+        
+        <h4>See you soon !</h4>
     </body>
 </html>

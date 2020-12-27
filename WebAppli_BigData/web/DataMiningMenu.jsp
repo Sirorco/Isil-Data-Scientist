@@ -19,7 +19,18 @@
 
             if ((boolean)session.getAttribute("isdatascientist") == true)
             {
-                %> <h4>You are datascientist !</h4><%
+                %> <h4>You are datascientist !</h4>
+                <h4>DataMining threatment availiable :</h4>
+                
+                <form method="GET" action="/WebAppli_BigData/DoDataMining.jsp"> 
+                <input type="radio" name="threatment" value="Regr-Corr" />Regression-Correlation
+                <input type="radio" name="threatment" value="Anova2" />Anova2
+                <input type="radio" name="threatment" value="ACM" />ACM
+                <input type="radio" name="threatment" value="CAH" />CAH
+                <P><input type="submit" value="Launch operation"></P> <!-- Le bt de type submit, va directement appeler la methode specifiée au dessus-->
+                </form> 
+                
+                <BR>&nbsp;<BR>&nbsp; <%
 
             }
             else //Not a datascientist
@@ -28,8 +39,22 @@
                 %> <h4>You aren't a datascientist !</h4><%
             }
 
-            %><form method="GET" action="/WebAppli_BigData/Logout"> 
-             <P><input type="submit" value="Logout !"></P> <!-- Le bt de type submit, va directement apeller la methode specifier au dessus--><%
+            %> <h4>DataMining result availiable :</h4>
+
+            <form method="GET" action="/WebAppli_BigData/DisplayDataMining.jsp"> 
+            <input type="radio" name="threatment" value="Regr-Corr" />Regression-Correlation
+            <input type="radio" name="threatment" value="Anova2" />Anova2
+            <input type="radio" name="threatment" value="ACM" />ACM
+            <input type="radio" name="threatment" value="CAH" />CAH
+            <P><input type="submit" value="View results"></P> <!-- Le bt de type submit, va directement appeler la methode specifiée au dessus-->
+            </form> 
+            
+            <BR>&nbsp;<BR>&nbsp; <%
+
+            %>
+            <BR>&nbsp;<BR>&nbsp; 
+            <form method="GET" action="/WebAppli_BigData/Logout.jsp"> 
+            <P><input type="submit" value="Logout !"></P> <!-- Le bt de type submit, va directement appeler la methode specifiée au dessus--><%
  
         %>
 

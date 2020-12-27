@@ -16,7 +16,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>JSP Init</title>
     </head>
     <body>
         <%  
@@ -49,18 +49,15 @@
                 if ((boolean)session.getAttribute("isdatascientist") == true)
                 {
                     %> <h4>You are datascientist !</h4><%
-                    %><form method="GET" action="/WebAppli_BigData/DataMiningMenu"> 
-                    <P><input type="submit" value="Go do some datamining !"></P> <!-- Le bt de type submit, va directement apeller la methode specifier au dessus--><%
                 }
                 else //Not a datascientist
                 {
                     //Call the JSP that pump the data from the server
                     %> <h4>You aren't a datascientist !</h4><%
-                    %><form method="GET" action="/WebAppli_BigData/DataMiningMenu"> 
-                    <P><input type="submit" value="Go do some datamining !"></P> <!-- Le bt de type submit, va directement apeller la methode specifier au dessus--><%
                 }
  
-
+                %><form method="GET" action="/WebAppli_BigData/DataMiningMenu.jsp"> 
+                    <P><input type="submit" value="Go do some datamining !"></P> <!-- Le bt de type submit, va directement apeller la methode specifier au dessus--><%
                       
                 
             }

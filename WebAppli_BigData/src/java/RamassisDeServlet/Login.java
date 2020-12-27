@@ -39,13 +39,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import java.util.*;
+import javax.servlet.annotation.WebServlet;
 
 /**
  *
  * @author Thomas
  */
-//@WebServlet(name = "Login", urlPatterns = {"/Login"}, initParams = {
-//@WebInitParam(name = "TypeSGBD", value = "MySql")})
+@WebServlet(name = "Login", urlPatterns = {"/Login"})
 public class Login extends HttpServlet {
 
     /**
@@ -67,20 +67,23 @@ public class Login extends HttpServlet {
         super.init(config); 
         Security.addProvider(new BouncyCastleProvider());
         
-        try
+        /*try
         {
             FileInputStream fip= new FileInputStream("config.properties");
             Properties propfile=new Properties();
             propfile.load(fip);
 
-            port_auth = propfile.getProperty("port_serv", "5001");
+            port_auth = propfile.getProperty("port_serv", "50001");
             acs_address = propfile.getProperty("serv_address", "localhost");
             
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
+        
+        port_auth = "50001";
+        acs_address = "localhost";
 
     } 
     
@@ -111,6 +114,8 @@ public class Login extends HttpServlet {
             ois.close();
             oos.close();
             status = false;
+            
+            System.out.println ("Kill the streams");
         }
         else
         {
