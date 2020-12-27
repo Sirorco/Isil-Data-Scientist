@@ -30,9 +30,6 @@ public class DesktopApp {
             MainWindow window = new MainWindow(host,port);
             if(window.login())
                 window.setVisible(true);
-            
-            window.stop();
-            System.exit(0);
         }
         catch (IOException ex) {
             Logger.getLogger(DesktopApp.class.getName()).log(Level.SEVERE, null, ex);
