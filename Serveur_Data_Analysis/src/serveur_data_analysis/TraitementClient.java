@@ -122,7 +122,7 @@ public class TraitementClient implements Runnable {
                                     s.initVerify(pk);
                                     s.update(saltClient.getBytes());
                                     if (s.verify(requeteClient.getDigest())) {
-                                        if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
+                                        if (rs.getString("fonction").equalsIgnoreCase("Datascientist")) {
                                             ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
                                         } else {
                                             ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
@@ -178,7 +178,7 @@ public class TraitementClient implements Runnable {
                                 int tempCptAcces = Integer.parseInt(cptAcces);
                                 tempCptAcces++;
 
-                                if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
+                                if (rs.getString("fonction").equalsIgnoreCase("Datascientist")) {
                                     ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
                                 } else {
                                     ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
@@ -225,7 +225,7 @@ public class TraitementClient implements Runnable {
                                 String pin = rs.getString("pin");
                                 components.add(pin);
                                 if (requeteClient.VerifyDigest(md, components)) {
-                                    if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
+                                    if (rs.getString("fonction").equalsIgnoreCase("Datascientist")) {
                                         ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
                                     } else {
                                         ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
@@ -272,7 +272,7 @@ public class TraitementClient implements Runnable {
                                 String password = rs.getString("motDePasse");
                                 components.add(password);
                                 if (requeteClient.VerifyDigest(md, components)) {
-                                    if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
+                                    if (rs.getString("fonction").equalsIgnoreCase("Datascientist")) {
                                         ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
                                     } else {
                                         ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
