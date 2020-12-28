@@ -254,6 +254,23 @@ public class BeanJDBC implements Serializable {
         return true;
     }
     
+    public ResultSet ExecuteQuery(String query){
+        Statement myStmt = null;
+        ResultSet myRs = null;
+        if (myConn != null)
+        {
+            try {
+                myStmt = myConn.createStatement();
+                myRs = myStmt.executeQuery(query);
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+                Error = exc.getMessage();
+            }
+        }
+        
+        return myRs;
+    }
+    
     public boolean Isconnected ()
     {
         if (myConn == null)
