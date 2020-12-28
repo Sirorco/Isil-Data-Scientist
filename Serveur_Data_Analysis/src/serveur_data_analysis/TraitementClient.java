@@ -350,6 +350,9 @@ public class TraitementClient implements Runnable {
         } catch (IOException ex) {
             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + " LOGOUT du client !!");
+        System.out.println("Thread :" + this.toString() + " LOGOUT du client !!");
     }
 
     private boolean checkOCSP(X509Certificate certif) {
