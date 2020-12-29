@@ -49,14 +49,8 @@ public class RegCor extends DataminingProcessing {
             getDataset().put(RequestBigDataResult.REGCORR_GLOBAL_TITRE, rs.getString("titre"));
             getDataset().put(RequestBigDataResult.REGCORR_PLOT_ONE_TEXT, rs.getString("commentaire"));
             getDataset().put(RequestBigDataResult.REGCORR_GLOBAL_TEXT, rs.getString("conclusionGenerale"));
-            InputStream is = rs.getBinaryStream("graph");
-            try {
-                ImageIcon img= new ImageIcon(ImageIO.read(is));
-                //Ajout du graph un à la hashtable
-                getDataset().put(RequestBigDataResult.REGCORR_PLOT_ONE, img);
-            } catch (IOException ex) {
-                Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            //Ajout du graph un à la hashtable
+            getDataset().put(RequestBigDataResult.REGCORR_PLOT_ONE, rs.getBinaryStream("graph"));
         } catch (SQLException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -105,14 +99,15 @@ public class RegCor extends DataminingProcessing {
         }
         
         
-        //Ajout du graph un à la hashtable
-        getDataset().put(RequestBigDataResult.REGCORR_PLOT_ONE, img);
+        
         
         //update graph
         InputStream fis;
         try {
             fis = new ByteArrayInputStream(xp.asBytes());
             rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 1", "graph", fis);    
+            //Ajout du graph un à la hashtable
+            getDataset().put(RequestBigDataResult.REGCORR_PLOT_ONE, fis);
         } catch (REXPMismatchException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }

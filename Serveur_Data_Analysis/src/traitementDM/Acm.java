@@ -50,14 +50,9 @@ public class Acm extends DataminingProcessing {
             getDataset().put(RequestBigDataResult.ACM_GLOBAL_TITRE, rs.getString("titre"));
             getDataset().put(RequestBigDataResult.ACM_PLOT_ONE_TEXT, rs.getString("commentaire"));
             getDataset().put(RequestBigDataResult.ACM_GLOBAL_TEXT, rs.getString("conclusionGenerale"));
-            InputStream is = rs.getBinaryStream("graph");
-            try {
-                ImageIcon img= new ImageIcon(ImageIO.read(is));
-                //Ajout du graph un à la hashtable
-                getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, img);
-            } catch (IOException ex) {
-                Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            
+            //Ajout du graph un à la hashtable
+            getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, rs.getBinaryStream("graph"));
         } catch (SQLException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -96,18 +91,18 @@ public class Acm extends DataminingProcessing {
         }
         
         
-        //Ajout du graph un à la hashtable
-        getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, new ImageIcon(img));
-        
-        
         //update graph
         InputStream fis;
         try {
             fis = new ByteArrayInputStream(xp.asBytes());
             rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 5", "graph", fis);    
+            //Ajout du graph un à la hashtable
+            getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, fis);
         } catch (REXPMismatchException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
         
         //Select des datas dans mysql
         rs = getBeanJdbc().ExecuteQuery(""
