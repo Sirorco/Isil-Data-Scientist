@@ -18,15 +18,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -37,7 +34,6 @@ import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.X509TrustManager;
 
 /**
  *
@@ -113,30 +109,40 @@ public class TraitementClient implements Runnable {
                     if (saltClient != null) {
                         ResultSet rs = beanJdbc.SelectAllWhere("personnel", "login = \"" + requeteClient.getUsername() + "\"", BeanJDBC.NO_UPDATE);
                         if (rs.next()) {
-                            // Vérification avec le CA ??
                             X509Certificate certif = (X509Certificate) requeteClient.geteIDcertificate();
+                            
                             try {
                                 certif.checkValidity();
+                                
+                                if(checkOCSP(certif))
+                                {
+                                    //vérification signature
+                                    PublicKey pk = certif.getPublicKey();
+                                    Signature s = Signature.getInstance("SHA1withRSA");
+                                    s.initVerify(pk);
+                                    s.update(saltClient.getBytes());
+                                    if (s.verify(requeteClient.getDigest())) {
+                                        if (rs.getString("fonction").equalsIgnoreCase("Datascientist")) {
+                                            ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
+                                        } else {
+                                            ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
+                                        }
+                                        reponseClient.setStatus(true);
+
+                                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
+                                        System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
+                                    } else {
+                                        reponseClient.setStatus(false);
+                                    }
+                                }
+                                else
+                                    reponseClient.setStatus(false);
+                                
                             } catch (CertificateExpiredException | CertificateNotYetValidException ex) {
                                 Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                            PublicKey pk = certif.getPublicKey();
-                            Signature s = Signature.getInstance("SHA1withRSA");
-                            s.initVerify(pk);
-                            s.update(saltClient.getBytes());
-                            if (s.verify(requeteClient.getDigest())) {
-                                if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
-                                    ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
-                                } else {
-                                    ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
-                                }
-                                reponseClient.setStatus(true);
-
-                                mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
-                                System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
-                            } else {
                                 reponseClient.setStatus(false);
                             }
+
                         } else {
                             reponseClient.setStatus(false);
                         }
@@ -172,16 +178,17 @@ public class TraitementClient implements Runnable {
                                 int tempCptAcces = Integer.parseInt(cptAcces);
                                 tempCptAcces++;
 
-                                if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
+                                if (rs.getString("fonction").equalsIgnoreCase("Datascientist")) {
                                     ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
                                 } else {
                                     ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
                                 }
 
-                                // Mise à jour de la bdd pour l'incrémentation du compteur d'accès! ATTENTION VERIFIER L'ERREUR !!!!
                                 beanJdbc.Update("personnel", "login = \"" + requeteClient.getUsername() + "\"", "compteurAcces", Integer.toString(tempCptAcces));
-                                mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
-                                System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
+                                mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + " Personne authentifiée !");
+                                System.out.println("Thread :" + this.toString() + " Personne authentifiée !");
+                                mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + " Compteur d'accès mis à jour : " + Integer.toString(tempCptAcces));
+                                System.out.println("Thread :" + this.toString() + " Compteur d'accès mis à jour : " + Integer.toString(tempCptAcces));
 
                                 reponseClient.setStatus(true);
                             } else {
@@ -194,8 +201,8 @@ public class TraitementClient implements Runnable {
                         Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     if (!reponseClient.getStatus()) {
-                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne non authentifiée !");
-                        System.out.println("Thread :" + this.toString() + "Personne non authentifiée !");
+                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + " Personne non authentifiée !");
+                        System.out.println("Thread :" + this.toString() + " Personne non authentifiée !");
                     }
                 }
 
@@ -218,7 +225,7 @@ public class TraitementClient implements Runnable {
                                 String pin = rs.getString("pin");
                                 components.add(pin);
                                 if (requeteClient.VerifyDigest(md, components)) {
-                                    if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
+                                    if (rs.getString("fonction").equalsIgnoreCase("Datascientist")) {
                                         ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
                                     } else {
                                         ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
@@ -265,7 +272,7 @@ public class TraitementClient implements Runnable {
                                 String password = rs.getString("motDePasse");
                                 components.add(password);
                                 if (requeteClient.VerifyDigest(md, components)) {
-                                    if (rs.getString("isDatascientist").equalsIgnoreCase("true")) {
+                                    if (rs.getString("fonction").equalsIgnoreCase("Datascientist")) {
                                         ((RequestLoginResponse) reponseClient).setIsdatascientist(true);
                                     } else {
                                         ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
@@ -294,7 +301,7 @@ public class TraitementClient implements Runnable {
                     }
                 }
 
-                if (requeteBaseClient.getId() == BaseRequest.DO_BIG_DATA) {
+                if (requeteBaseClient.getId() == BaseRequest.BIG_DATA_RESULT) {
                     reponseClient = new RequestBigDataResult();
                     RequestDoBigData requeteClient = (RequestDoBigData) requeteBaseClient;
                     mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement BIG DATA");
@@ -343,6 +350,13 @@ public class TraitementClient implements Runnable {
         } catch (IOException ex) {
             Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + " LOGOUT du client !!");
+        System.out.println("Thread :" + this.toString() + " LOGOUT du client !!");
+    }
+
+    private boolean checkOCSP(X509Certificate certif) {
+        return true;
     }
 
 }

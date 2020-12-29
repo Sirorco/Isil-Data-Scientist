@@ -5,10 +5,14 @@
  */
 package desktopapp;
 
+import Protocol.BaseRequest;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -33,6 +37,17 @@ public class MainWindow extends javax.swing.JFrame {
         socket = new Socket(host,port);
         outputStream = new ObjectOutputStream(socket.getOutputStream());
         inputStream = new ObjectInputStream(socket.getInputStream());
+        
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                try {
+                    stop();
+                } catch (IOException ex) {
+                    Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
     
     public boolean login()
@@ -40,6 +55,16 @@ public class MainWindow extends javax.swing.JFrame {
         LoginDialog dialog = new LoginDialog(this,true,inputStream,outputStream);
         dialog.setVisible(true);
         return dialog.isOk();
+    }
+    
+    public void stop() throws IOException
+    {
+        BaseRequest req = new BaseRequest();
+        req.setId(BaseRequest.LOGOUT);
+        
+        outputStream.writeObject(req);
+        
+        socket.close();
     }
 
     /**
@@ -51,28 +76,82 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        viewPane = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        doPane = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("DesktoppApp");
+
+        jTabbedPane1.setName("View BigData"); // NOI18N
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel2.setText("TO DO");
+
+        javax.swing.GroupLayout viewPaneLayout = new javax.swing.GroupLayout(viewPane);
+        viewPane.setLayout(viewPaneLayout);
+        viewPaneLayout.setHorizontalGroup(
+            viewPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(viewPaneLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addContainerGap(743, Short.MAX_VALUE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        viewPaneLayout.setVerticalGroup(
+            viewPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(viewPaneLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addContainerGap(526, Short.MAX_VALUE))
         );
+
+        jLabel2.getAccessibleContext().setAccessibleName("");
+        jLabel2.getAccessibleContext().setAccessibleParent(jTabbedPane1);
+
+        jTabbedPane1.addTab("View BigData", viewPane);
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel3.setText("TO DO");
+
+        javax.swing.GroupLayout doPaneLayout = new javax.swing.GroupLayout(doPane);
+        doPane.setLayout(doPaneLayout);
+        doPaneLayout.setHorizontalGroup(
+            doPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(doPaneLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3)
+                .addContainerGap(743, Short.MAX_VALUE))
+        );
+        doPaneLayout.setVerticalGroup(
+            doPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(doPaneLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3)
+                .addContainerGap(526, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Do BigData", doPane);
+
+        getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        jTabbedPane1.getAccessibleContext().setAccessibleName("View BigData");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     void setDataScientist(boolean isdatascientist) {
         isDataScientist = isdatascientist;
-        //TO DO: ENABLE TAB
+        
+        jTabbedPane1.setEnabledAt(1, isdatascientist);
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel doPane;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JPanel viewPane;
     // End of variables declaration//GEN-END:variables
 }
