@@ -8,9 +8,6 @@ package connectionRServe;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 
@@ -52,36 +49,6 @@ public class BeanRServe {
         }
     }
     
-    
-    public void voidEval(String eval){
-        try {
-            connection.voidEval(eval);
-        } catch (RserveException ex) {
-            Logger.getLogger(BeanRServe.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    public REXP parseAndEval(String eval){
-        try {
-            return connection.parseAndEval(eval);
-        } catch (RserveException ex) {
-            Logger.getLogger(BeanRServe.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (REngineException ex) {
-            Logger.getLogger(BeanRServe.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (REXPMismatchException ex) {
-            Logger.getLogger(BeanRServe.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-    
-    public REXP eval(String eval){
-        try {
-            return connection.eval(eval);
-        } catch (RserveException ex) {
-            Logger.getLogger(BeanRServe.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
     private void doACP_ACM(boolean isACP ,String nameDatasetOut, String nameDatasetIn, List qualiSupList, List quantiSupList)
     {
         String typeAnalyse;

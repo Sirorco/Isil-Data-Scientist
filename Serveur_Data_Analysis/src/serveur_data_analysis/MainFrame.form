@@ -32,7 +32,7 @@
           <Font name="Tahoma" size="20" style="1"/>
         </Property>
         <Property name="horizontalAlignment" type="int" value="0"/>
-        <Property name="text" type="java.lang.String" value="Serveur_Data_Analysis"/>
+        <Property name="text" type="java.lang.String" value="Serveur_Bateaux"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JPanel" name="jPanelEnvoi">
