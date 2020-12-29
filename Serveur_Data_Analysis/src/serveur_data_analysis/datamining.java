@@ -44,6 +44,13 @@ public class datamining extends javax.swing.JFrame {
         jTabbedPane3 = new javax.swing.JTabbedPane();
         DmSelectionTabbedPane = new javax.swing.JTabbedPane();
         RegCoorPanel = new javax.swing.JPanel();
+        TitlePanelReg = new javax.swing.JPanel();
+        TitleLabelReg = new javax.swing.JLabel();
+        ImagePanelreg = new javax.swing.JPanel();
+        ImageLabelReg = new javax.swing.JLabel();
+        ConclusionPanelReg = new javax.swing.JPanel();
+        DescriptionLabelReg = new javax.swing.JLabel();
+        ConclusionLabelReg = new javax.swing.JLabel();
         AnovaPanel = new javax.swing.JPanel();
         TitlePanelAnova = new javax.swing.JPanel();
         TitleLabelAnova = new javax.swing.JLabel();
@@ -79,16 +86,79 @@ public class datamining extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.Y_AXIS));
 
-        javax.swing.GroupLayout RegCoorPanelLayout = new javax.swing.GroupLayout(RegCoorPanel);
-        RegCoorPanel.setLayout(RegCoorPanelLayout);
-        RegCoorPanelLayout.setHorizontalGroup(
-            RegCoorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 805, Short.MAX_VALUE)
+        RegCoorPanel.setLayout(new javax.swing.BoxLayout(RegCoorPanel, javax.swing.BoxLayout.Y_AXIS));
+
+        TitleLabelReg.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        TitleLabelReg.setText("Retard en fonction du nbr de dockers et du nbr de conteneurs");
+
+        javax.swing.GroupLayout TitlePanelRegLayout = new javax.swing.GroupLayout(TitlePanelReg);
+        TitlePanelReg.setLayout(TitlePanelRegLayout);
+        TitlePanelRegLayout.setHorizontalGroup(
+            TitlePanelRegLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 569, Short.MAX_VALUE)
+            .addGroup(TitlePanelRegLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(TitlePanelRegLayout.createSequentialGroup()
+                    .addGap(0, 108, Short.MAX_VALUE)
+                    .addComponent(TitleLabelReg)
+                    .addGap(0, 108, Short.MAX_VALUE)))
         );
-        RegCoorPanelLayout.setVerticalGroup(
-            RegCoorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 373, Short.MAX_VALUE)
+        TitlePanelRegLayout.setVerticalGroup(
+            TitlePanelRegLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 157, Short.MAX_VALUE)
+            .addGroup(TitlePanelRegLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(TitlePanelRegLayout.createSequentialGroup()
+                    .addGap(0, 71, Short.MAX_VALUE)
+                    .addComponent(TitleLabelReg)
+                    .addGap(0, 70, Short.MAX_VALUE)))
         );
+
+        RegCoorPanel.add(TitlePanelReg);
+
+        javax.swing.GroupLayout ImagePanelregLayout = new javax.swing.GroupLayout(ImagePanelreg);
+        ImagePanelreg.setLayout(ImagePanelregLayout);
+        ImagePanelregLayout.setHorizontalGroup(
+            ImagePanelregLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ImagePanelregLayout.createSequentialGroup()
+                .addGap(236, 236, 236)
+                .addComponent(ImageLabelReg)
+                .addContainerGap(333, Short.MAX_VALUE))
+        );
+        ImagePanelregLayout.setVerticalGroup(
+            ImagePanelregLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ImagePanelregLayout.createSequentialGroup()
+                .addGap(32, 32, 32)
+                .addComponent(ImageLabelReg)
+                .addContainerGap(111, Short.MAX_VALUE))
+        );
+
+        RegCoorPanel.add(ImagePanelreg);
+
+        DescriptionLabelReg.setText("Graph-description");
+
+        ConclusionLabelReg.setText("Conclusion");
+
+        javax.swing.GroupLayout ConclusionPanelRegLayout = new javax.swing.GroupLayout(ConclusionPanelReg);
+        ConclusionPanelReg.setLayout(ConclusionPanelRegLayout);
+        ConclusionPanelRegLayout.setHorizontalGroup(
+            ConclusionPanelRegLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ConclusionPanelRegLayout.createSequentialGroup()
+                .addGap(332, 332, 332)
+                .addGroup(ConclusionPanelRegLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(DescriptionLabelReg)
+                    .addComponent(ConclusionLabelReg))
+                .addContainerGap(136, Short.MAX_VALUE))
+        );
+        ConclusionPanelRegLayout.setVerticalGroup(
+            ConclusionPanelRegLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ConclusionPanelRegLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(DescriptionLabelReg)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ConclusionLabelReg)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        RegCoorPanel.add(ConclusionPanelReg);
 
         DmSelectionTabbedPane.addTab("Reg-Coor", RegCoorPanel);
 
@@ -583,7 +653,79 @@ public class datamining extends javax.swing.JFrame {
     }
     
     private void refreshRegCor(){
+        connectToJDBC();
+        connectToRServ();
+        //Requête SQL pour former la table comprenant "nconteneurs, retard, mois, nDockers"
+        String request = "select "
+                + "     count(id) as 'nconteneurs', "
+                + "     sum(retard) as 'retard', "
+                //+ "     monthname(dateDepartPrevu) as 'mois', "
+                + "     w.nDockers as 'ndockers'"
+                + "from "
+                + "     transports t,"
+                + "     bd_compta.workingdockers w "
+                + "where"
+                + "     monthname(t.dateDepartPrevu) like w.mois "
+                + "group by "
+                + "     monthname(dateDepartPrevu)";
+        System.out.println(request);
+        ResultSet rs = beanJdbc.ExecuteQuery(request);
         
+        //Envoie de la table à RServe
+        exportResultasDatasetInRServe(rs,"Retard");
+        //Modification des type de col
+        beanRServ.voidEval("Retard$nconteneurs=as.numeric(Retard$nconteneurs)");
+        beanRServ.voidEval("Retard$retard=as.numeric(Retard$retard)");
+        beanRServ.voidEval("Retard$nDockers =as.numeric(Retard$nDockers)");
+        //beanRServ.voidEval("rownames(Retard)<-Retard[,3]");
+        
+        //Préparation du fichier image dans RServe
+        beanRServ.eval("png(file='Retard.png',width=1400,height=800)");
+        //Création du graph
+        beanRServ.parseAndEval("plot(Retard);dev.off()");
+        
+        //Import du graph 
+        REXP xp = beanRServ.parseAndEval("r=readBin('Retard.png','raw',1400*800)");
+        beanRServ.parseAndEval("unlink('Retard.png');r");
+        Image img = null;
+        try {
+            img = Toolkit.getDefaultToolkit().createImage(xp.asBytes());
+        } catch (REXPMismatchException ex) {
+            Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        //Affichage du graph
+        ImageLabelReg.setIcon(new ImageIcon(img));
+        ImageLabelReg.repaint();
+        
+        //update graph
+        InputStream fis;
+        try {
+            fis = new ByteArrayInputStream(xp.asBytes());
+            rs = beanJdbc.Update("bd_decisions.analyse_graph", "id = 1", "graph", fis);    
+        } catch (REXPMismatchException ex) {
+            Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        //Select des datas dans mysql
+        rs = beanJdbc.ExecuteQuery(""
+                + "select "
+                + "     titre, fonction, conclusionGenerale, commentaire "
+                + "from "
+                + "     bd_decisions.analyse a, bd_decisions.analyse_graph ag "
+                + "where "
+                + "     a.fonction = 'Regression-corrélation' and ag.analyse_id = a.id");
+        //debugResultSet(rs);
+        
+        try {
+            rs.first();
+            TitleLabelReg.setText(rs.getString("titre"));
+            DescriptionLabelReg.setText(rs.getString("commentaire"));
+            ConclusionLabelReg.setText(rs.getString("conclusionGenerale"));
+        } catch (SQLException ex) {
+            Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
     
     private void refreshCAH(){
@@ -771,7 +913,33 @@ public class datamining extends javax.swing.JFrame {
     }
     
     private void getDMRegCor(){
+        connectToJDBC();
+        ResultSet rs = beanJdbc.ExecuteQuery(""
+                + "select "
+                + "     titre, fonction, conclusionGenerale, commentaire, graph "
+                + "from "
+                + "     bd_decisions.analyse a, bd_decisions.analyse_graph ag "
+                + "where "
+                + "     a.fonction = 'Regression-corrélation' and ag.analyse_id = a.id");
+        //debugResultSet(rs);
         
+        try {
+            rs.first();
+            TitleLabelReg.setText(rs.getString("titre"));
+            DescriptionLabelReg.setText(rs.getString("commentaire"));
+            ConclusionLabelReg.setText(rs.getString("conclusionGenerale"));
+            InputStream is = rs.getBinaryStream("graph");
+            try {
+                ImageIcon img= new ImageIcon(ImageIO.read(is));
+                //Affichage du graph
+                ImageLabelReg.setIcon(img);
+                ImageLabelReg.repaint();
+            } catch (IOException ex) {
+                Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private void getDMAnova(){
@@ -884,30 +1052,37 @@ public class datamining extends javax.swing.JFrame {
     private javax.swing.JLabel ConclusionLabelACM;
     private javax.swing.JLabel ConclusionLabelAnova;
     private javax.swing.JLabel ConclusionLabelCAH;
+    private javax.swing.JLabel ConclusionLabelReg;
     private javax.swing.JPanel ConclusionPanelACM;
     private javax.swing.JPanel ConclusionPanelAnova;
     private javax.swing.JPanel ConclusionPanelCAH;
+    private javax.swing.JPanel ConclusionPanelReg;
     private javax.swing.JLabel DescriptionLabelACM;
     private javax.swing.JLabel DescriptionLabelAnova;
     private javax.swing.JLabel DescriptionLabelCAH;
     private javax.swing.JLabel DescriptionLabelCAH2;
+    private javax.swing.JLabel DescriptionLabelReg;
     private javax.swing.JTabbedPane DmSelectionTabbedPane;
     private javax.swing.JButton GetDMButton;
     private javax.swing.JLabel ImageLabelACM;
     private javax.swing.JLabel ImageLabelAnova;
     private javax.swing.JLabel ImageLabelCAH;
     private javax.swing.JLabel ImageLabelCAH2;
+    private javax.swing.JLabel ImageLabelReg;
     private javax.swing.JPanel ImagePanelACM;
     private javax.swing.JPanel ImagePanelAnova;
     private javax.swing.JPanel ImagePanelCAH;
+    private javax.swing.JPanel ImagePanelreg;
     private javax.swing.JButton RefreshButton;
     private javax.swing.JPanel RegCoorPanel;
     private javax.swing.JLabel TitleLabelACM;
     private javax.swing.JLabel TitleLabelAnova;
     private javax.swing.JLabel TitleLabelCAH;
+    private javax.swing.JLabel TitleLabelReg;
     private javax.swing.JPanel TitlePanelACM;
     private javax.swing.JPanel TitlePanelAnova;
     private javax.swing.JPanel TitlePanelCAH;
+    private javax.swing.JPanel TitlePanelReg;
     private javax.swing.JPanel imgPanel1;
     private javax.swing.JPanel imgPanel2;
     private javax.swing.JTabbedPane jTabbedPane3;
