@@ -51,25 +51,12 @@ public class Cah extends DataminingProcessing {
             getDataset().put(RequestBigDataResult.CAH_GLOBAL_TITRE, rs.getString("titre"));
             getDataset().put(RequestBigDataResult.CAH_PLOT_ONE_TEXT, rs.getString("commentaire"));
             getDataset().put(RequestBigDataResult.CAH_GLOBAL_TEXT, rs.getString("conclusionGenerale"));
-            InputStream is = rs.getBinaryStream("graph");
-            try {
-                ImageIcon img= new ImageIcon(ImageIO.read(is));
-                //Ajout du graph un à la hashtable
-                getDataset().put(RequestBigDataResult.CAH_PLOT_ONE, img);
-            } catch (IOException ex) {
-                Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            //Ajout du graph un à la hashtable
+            getDataset().put(RequestBigDataResult.CAH_PLOT_ONE, rs.getBinaryStream("graph"));
             
             rs.next();
             getDataset().put(RequestBigDataResult.CAH_PLOT_TWO_TEXT, rs.getString("commentaire"));
-            is = rs.getBinaryStream("graph");
-            try {
-                ImageIcon img= new ImageIcon(ImageIO.read(is));
-                //Affichage du graph
-                getDataset().put(RequestBigDataResult.CAH_PLOT_TWO, img);
-            } catch (IOException ex) {
-                Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            getDataset().put(RequestBigDataResult.CAH_PLOT_TWO, rs.getBinaryStream("graph"));
         } catch (SQLException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -118,14 +105,15 @@ public class Cah extends DataminingProcessing {
         }
         
         
-        //Ajout du graph un à la hashtable
-        getDataset().put(RequestBigDataResult.CAH_PLOT_ONE, new ImageIcon(img));
+        
         
         //update graph
         InputStream fis;
         try {
             fis = new ByteArrayInputStream(xp.asBytes());
-            rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 3", "graph", fis);    
+            rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 3", "graph", fis); 
+            //Ajout du graph un à la hashtable
+            getDataset().put(RequestBigDataResult.CAH_PLOT_ONE, fis);
         } catch (REXPMismatchException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -167,13 +155,14 @@ public class Cah extends DataminingProcessing {
         }
         
         
-        //Ajout du graph deux à la hashtable
-        getDataset().put(RequestBigDataResult.CAH_PLOT_TWO, img);
+        
         
         //update graph
         try {
             fis = new ByteArrayInputStream(xp.asBytes());
-            rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 4", "graph", fis);    
+            rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 4", "graph", fis);   
+            //Ajout du graph deux à la hashtable
+        getDataset().put(RequestBigDataResult.CAH_PLOT_TWO, fis);
         } catch (REXPMismatchException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
