@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package serveur_data_analysis;
+package traitementDM;
 
 import Protocol.RequestBigDataResult;
 import java.awt.Image;
@@ -20,6 +20,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
+import traitementDM.tests.datamining;
 
 /**
  *
@@ -35,9 +36,9 @@ public class Cah extends DataminingProcessing {
     
     
     public void getDMCAH(){
-        ResultSet rs = beanJdbc.ExecuteQuery(""
+        ResultSet rs = getBeanJdbc().ExecuteQuery(""
                 + "select "
-                + "     titre, fonction, conclusionGenerale, commentaire, graph "
+                + "     titre, fonction, conclusionGenerale, commentaire, graph, maj "
                 + "from "
                 + "     bd_decisions.analyse a, bd_decisions.analyse_graph ag "
                 + "where "
@@ -46,25 +47,26 @@ public class Cah extends DataminingProcessing {
         
         try {
             rs.first();
-            datasetReturn.put(RequestBigDataResult.CAH_PLOT_ONE_TEXT, rs.getString("commentaire"));
-            TitleLabelCAH.setText(rs.getString("titre"));
-            datasetReturn.put(RequestBigDataResult.CAH_GLOBAL_TEXT, rs.getString("conclusionGenerale"));
+            getDataset().put(RequestBigDataResult.CAH_DATE, rs.getTimestamp("maj"));
+            getDataset().put(RequestBigDataResult.CAH_GLOBAL_TITRE, rs.getString("titre"));
+            getDataset().put(RequestBigDataResult.CAH_PLOT_ONE_TEXT, rs.getString("commentaire"));
+            getDataset().put(RequestBigDataResult.CAH_GLOBAL_TEXT, rs.getString("conclusionGenerale"));
             InputStream is = rs.getBinaryStream("graph");
             try {
                 ImageIcon img= new ImageIcon(ImageIO.read(is));
                 //Ajout du graph un à la hashtable
-                datasetReturn.put(RequestBigDataResult.CAH_PLOT_ONE, img);
+                getDataset().put(RequestBigDataResult.CAH_PLOT_ONE, img);
             } catch (IOException ex) {
                 Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             rs.next();
-            datasetReturn.put(RequestBigDataResult.CAH_PLOT_TWO_TEXT, rs.getString("commentaire"));
+            getDataset().put(RequestBigDataResult.CAH_PLOT_TWO_TEXT, rs.getString("commentaire"));
             is = rs.getBinaryStream("graph");
             try {
                 ImageIcon img= new ImageIcon(ImageIO.read(is));
                 //Affichage du graph
-                datasetReturn.put(RequestBigDataResult.CAH_PLOT_TWO, img);
+                getDataset().put(RequestBigDataResult.CAH_PLOT_TWO, img);
             } catch (IOException ex) {
                 Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -76,10 +78,10 @@ public class Cah extends DataminingProcessing {
     
     public void refreshCAH(){
         
-        datasetReturn = new Hashtable();
+        setDataset(new Hashtable());
         
         //Requête SQL pour former la table comprenant "destination_villeDepart, destination_villeArrivee, count(destination_villeDepart)"
-        ResultSet rs = beanJdbc.ExecuteQuery(""
+        ResultSet rs = getBeanJdbc().ExecuteQuery(""
                 + "select "
                 + "     MONTHNAME(mois) as mois, "
                 + "     SUM(total) as factures "
@@ -93,21 +95,21 @@ public class Cah extends DataminingProcessing {
         //Envoie de la table à RServe
         exportResultasDatasetInRServe(rs,"Benefices");
         //Modification des type de col
-        beanRServ.voidEval("Benefices$factures=as.numeric(Benefices$factures)");
-        beanRServ.voidEval("rownames(Benefices) <- Benefices[,1]");
+        getBeanRServ().voidEval("Benefices$factures=as.numeric(Benefices$factures)");
+        getBeanRServ().voidEval("rownames(Benefices) <- Benefices[,1]");
         
         //Graph1
-        beanRServ.eval("library(cluster)");
+        getBeanRServ().eval("library(cluster)");
         //Préparation du fichier image dans RServe
-        beanRServ.eval("png(file='Benefices.png',width=800,height=800)");
+        getBeanRServ().eval("png(file='Benefices.png',width=800,height=800)");
         //Création du graph
-        beanRServ.voidEval("class = agnes(Benefices, method='ward')");
-        beanRServ.voidEval("plot(class)");
-        beanRServ.eval("plot(class);dev.off()");
+        getBeanRServ().voidEval("class = agnes(Benefices, method='ward')");
+        getBeanRServ().voidEval("plot(class)");
+        getBeanRServ().eval("plot(class);dev.off()");
         
         //Import du graph 
-        REXP xp = beanRServ.parseAndEval("r=readBin('Benefices.png','raw',800*800)");
-        beanRServ.parseAndEval("unlink('Benefices.png');r");
+        REXP xp = getBeanRServ().parseAndEval("r=readBin('Benefices.png','raw',800*800)");
+        getBeanRServ().parseAndEval("unlink('Benefices.png');r");
         Image img = null;
         try {
             img = Toolkit.getDefaultToolkit().createImage(xp.asBytes());
@@ -117,21 +119,21 @@ public class Cah extends DataminingProcessing {
         
         
         //Ajout du graph un à la hashtable
-        datasetReturn.put(RequestBigDataResult.CAH_PLOT_ONE, new ImageIcon(img));
+        getDataset().put(RequestBigDataResult.CAH_PLOT_ONE, new ImageIcon(img));
         
         //update graph
         InputStream fis;
         try {
             fis = new ByteArrayInputStream(xp.asBytes());
-            rs = beanJdbc.Update("bd_decisions.analyse_graph", "id = 3", "graph", fis);    
+            rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 3", "graph", fis);    
         } catch (REXPMismatchException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         //Select des datas dans mysql
-        rs = beanJdbc.ExecuteQuery(""
+        rs = getBeanJdbc().ExecuteQuery(""
                 + "select "
-                + "     titre, fonction, conclusionGenerale, commentaire "
+                + "     titre, fonction, conclusionGenerale, commentaire, maj "
                 + "from "
                 + "     bd_decisions.analyse a, bd_decisions.analyse_graph ag "
                 + "where "
@@ -140,21 +142,23 @@ public class Cah extends DataminingProcessing {
         
         try {
             rs.first();
-            datasetReturn.put(RequestBigDataResult.CAH_PLOT_ONE_TEXT, rs.getString("titre") + " : " + rs.getString("commentaire"));
-            datasetReturn.put(RequestBigDataResult.CAH_GLOBAL_TEXT, rs.getString("conclusionGenerale"));
+            getDataset().put(RequestBigDataResult.CAH_DATE, rs.getTimestamp("maj"));
+            getDataset().put(RequestBigDataResult.CAH_GLOBAL_TITRE, rs.getString("titre"));
+            getDataset().put(RequestBigDataResult.CAH_PLOT_ONE_TEXT, rs.getString("commentaire"));
+            getDataset().put(RequestBigDataResult.CAH_GLOBAL_TEXT, rs.getString("conclusionGenerale"));
         } catch (SQLException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         //Graph2
         //Préparation du fichier image dans RServe
-        beanRServ.eval("png(file='Benefices2.png',width=800,height=800)");
+        getBeanRServ().eval("png(file='Benefices2.png',width=800,height=800)");
         //Création du graph
-        beanRServ.eval("barplot(Benefices$factures, main = 'Benefices mensuelles', xlab ='Mois', ylab='Benefice',col='green', names.arg=row.names(Benefices));dev.off()");
+        getBeanRServ().eval("barplot(Benefices$factures, main = 'Benefices mensuelles', xlab ='Mois', ylab='Benefice',col='green', names.arg=row.names(Benefices));dev.off()");
         
         //Import du graph 
-        xp = beanRServ.parseAndEval("r=readBin('Benefices2.png','raw',800*800)");
-        beanRServ.parseAndEval("unlink('Benefices2.png');r");
+        xp = getBeanRServ().parseAndEval("r=readBin('Benefices2.png','raw',800*800)");
+        getBeanRServ().parseAndEval("unlink('Benefices2.png');r");
         img = null;
         try {
             img = Toolkit.getDefaultToolkit().createImage(xp.asBytes());
@@ -164,23 +168,23 @@ public class Cah extends DataminingProcessing {
         
         
         //Ajout du graph deux à la hashtable
-        datasetReturn.put(RequestBigDataResult.CAH_PLOT_TWO, img);
+        getDataset().put(RequestBigDataResult.CAH_PLOT_TWO, img);
         
         //update graph
         try {
             fis = new ByteArrayInputStream(xp.asBytes());
-            rs = beanJdbc.Update("bd_decisions.analyse_graph", "id = 4", "graph", fis);    
+            rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 4", "graph", fis);    
         } catch (REXPMismatchException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         //Select des datas dans mysql
-        rs = beanJdbc.ExecuteQuery("select commentaire from bd_decisions.analyse_graph where id =4");
+        rs = getBeanJdbc().ExecuteQuery("select commentaire from bd_decisions.analyse_graph where id =4");
         //debugResultSet(rs);
         
         try {
             rs.first();
-            datasetReturn.put(RequestBigDataResult.CAH_PLOT_TWO_TEXT, rs.getString("commentaire"));
+            getDataset().put(RequestBigDataResult.CAH_PLOT_TWO_TEXT, rs.getString("commentaire"));
         } catch (SQLException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
