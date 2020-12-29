@@ -11,13 +11,14 @@ package serveur_data_analysis;
  */
 public class MainFrame extends javax.swing.JFrame {
     
-    
+    MainServer ms;
 
     /**
      * Creates new form FenêtrePrincipale
      */
     public MainFrame() {
         initComponents();
+        ms = null;
     }
 
     /**
@@ -42,7 +43,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Serveur_Bateaux");
+        jLabel1.setText("Serveur_Data_Analysis");
         getContentPane().add(jLabel1);
 
         jPanelEnvoi.setLayout(new java.awt.GridLayout(0, 1));
@@ -78,12 +79,13 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonDemarrageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDemarrageActionPerformed
-
-       
+        ms = new MainServer(this);
+        ms.open();
     }//GEN-LAST:event_jButtonDemarrageActionPerformed
 
     private void jButtonArrêtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonArrêtActionPerformed
-
+        if(ms != null)
+            ms.close();
     }//GEN-LAST:event_jButtonArrêtActionPerformed
 
     /**
