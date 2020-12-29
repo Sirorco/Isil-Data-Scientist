@@ -301,7 +301,7 @@ public class TraitementClient implements Runnable {
                     }
                 }
 
-                if (requeteBaseClient.getId() == BaseRequest.DO_BIG_DATA) {
+                if (requeteBaseClient.getId() == BaseRequest.BIG_DATA_RESULT) {
                     reponseClient = new RequestBigDataResult();
                     RequestDoBigData requeteClient = (RequestDoBigData) requeteBaseClient;
                     mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement BIG DATA");
