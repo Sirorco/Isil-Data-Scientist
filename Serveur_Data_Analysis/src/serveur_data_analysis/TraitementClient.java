@@ -13,6 +13,7 @@ import Protocol.RequestLoginInitiator;
 import Protocol.RequestLoginResponse;
 import Protocol.RequestLogineID;
 import connectionJdbc.BeanJDBC;
+import connectionRServe.BeanRServe;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,6 +35,10 @@ import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import traitementDM.Acm;
+import traitementDM.Anova2;
+import traitementDM.Cah;
+import traitementDM.RegCor;
 
 /**
  *
@@ -45,8 +50,16 @@ public class TraitementClient implements Runnable {
     private Socket cSocket;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
+    
+    //Objets pour le traitement DM :
+    private Acm acm;
+    private Anova2 anova2;
+    private Cah cah;
+    private RegCor regCor;
 
     private BeanJDBC beanJdbc; //Objet pour la connexion à la BDD
+    
+    private BeanRServe beanRServe; //Objet pour la connexion à R
 
     public TraitementClient(Socket cSocket, MainFrame mF) {
         this.mF = mF;
@@ -70,13 +83,14 @@ public class TraitementClient implements Runnable {
             e.printStackTrace();
         }
         beanJdbc = new BeanJDBC(name, user, mdp);
-
+        beanRServe = new BeanRServe();
+        
     }
 
     @Override
     public void run() {
-        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Lancement du thread de traitement client !");
-        System.out.println("Thread :" + this.toString() + "Lancement du thread de traitement client !");
+        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Lancement du thread de traitement client !");
+        System.out.println("Thread : " + this.toString() + " Lancement du thread de traitement client !");
         BaseRequest requeteBaseClient = null;
         BaseRequest reponseClient = null;
         String saltClient = null;
@@ -84,8 +98,8 @@ public class TraitementClient implements Runnable {
         try {
             while ((requeteBaseClient = (BaseRequest) ois.readObject()).getId() != BaseRequest.LOGOUT) {
                 if (requeteBaseClient.getId() == BaseRequest.LOGIN_INITIATOR) {
-                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement initialisation login");
-                    System.out.println("Thread :" + this.toString() + "Traitement initialisation login");
+                    mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Traitement initialisation login");
+                    System.out.println("Thread : " + this.toString() + " Traitement initialisation login");
 
                     // Traitement initialisation login
                     SecureRandom sr = new SecureRandom();
@@ -94,16 +108,16 @@ public class TraitementClient implements Runnable {
                     saltClient = Arrays.toString(byteSr);
                     reponseClient = new RequestLoginInitiator();
                     ((RequestLoginInitiator) reponseClient).setSaltChallenge(saltClient);
-                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Sallage construit !");
-                    System.out.println("Thread :" + this.toString() + "Sallage construit !");
+                    mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Sallage construit !");
+                    System.out.println("Thread : " + this.toString() + " Sallage construit !");
                     reponseClient.setStatus(true);
                 }
 
                 if (requeteBaseClient.getId() == BaseRequest.LOGIN_EID) {
                     reponseClient = new RequestLoginResponse();
                     RequestLogineID requeteClient = (RequestLogineID) requeteBaseClient;
-                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement login EID");
-                    System.out.println("Thread :" + this.toString() + "Traitement login EID");
+                    mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Traitement login EID");
+                    System.out.println("Thread :" + this.toString() + " Traitement login EID");
 
                     //Traitement login EID
                     if (saltClient != null) {
@@ -129,8 +143,8 @@ public class TraitementClient implements Runnable {
                                         }
                                         reponseClient.setStatus(true);
 
-                                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
-                                        System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
+                                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Personne authentifiée !");
+                                        System.out.println("Thread : " + this.toString() + " Personne authentifiée !");
                                     } else {
                                         reponseClient.setStatus(false);
                                     }
@@ -151,8 +165,8 @@ public class TraitementClient implements Runnable {
                     }
 
                     if (!reponseClient.getStatus()) {
-                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne non authentifiée !");
-                        System.out.println("Thread :" + this.toString() + "Personne non authentifiée !");
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Personne non authentifiée !");
+                        System.out.println("Thread : " + this.toString() + " Personne non authentifiée !");
                     }
                 }
 
@@ -201,8 +215,8 @@ public class TraitementClient implements Runnable {
                         Logger.getLogger(TraitementClient.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     if (!reponseClient.getStatus()) {
-                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + " Personne non authentifiée !");
-                        System.out.println("Thread :" + this.toString() + " Personne non authentifiée !");
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Personne non authentifiée !");
+                        System.out.println("Thread : " + this.toString() + " Personne non authentifiée !");
                     }
                 }
 
@@ -232,8 +246,8 @@ public class TraitementClient implements Runnable {
                                     }
                                     reponseClient.setStatus(true);
 
-                                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
-                                    System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
+                                    mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Personne authentifiée !");
+                                    System.out.println("Thread : " + this.toString() + " Personne authentifiée !");
                                 } else {
                                     reponseClient.setStatus(false);
                                 }
@@ -250,16 +264,16 @@ public class TraitementClient implements Runnable {
                     }
 
                     if (!reponseClient.getStatus()) {
-                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne non authentifiée !");
-                        System.out.println("Thread :" + this.toString() + "Personne non authentifiée !");
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Personne non authentifiée !");
+                        System.out.println("Thread : " + this.toString() + " Personne non authentifiée !");
                     }
                 }
 
                 if (requeteBaseClient.getId() == BaseRequest.LOGIN_WEB) {
                     reponseClient = new RequestLoginResponse();
                     RequestLogin requeteClient = (RequestLogin) requeteBaseClient;
-                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement login WEB");
-                    System.out.println("Thread :" + this.toString() + "Traitement login WEB");
+                    mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Traitement login WEB");
+                    System.out.println("Thread : " + this.toString() + " Traitement login WEB");
 
                     // Traitement login WEB
                     if (saltClient != null) {
@@ -278,8 +292,8 @@ public class TraitementClient implements Runnable {
                                         ((RequestLoginResponse) reponseClient).setIsdatascientist(false);
                                     }
 
-                                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne authentifiée !");
-                                    System.out.println("Thread :" + this.toString() + "Personne authentifiée !");
+                                    mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Personne authentifiée !");
+                                    System.out.println("Thread : " + this.toString() + " Personne authentifiée !");
 
                                     reponseClient.setStatus(true);
                                 } else {
@@ -296,34 +310,142 @@ public class TraitementClient implements Runnable {
                         reponseClient.setStatus(false);
                     }
                     if (!reponseClient.getStatus()) {
-                        mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Personne non authentifiée !");
-                        System.out.println("Thread :" + this.toString() + "Personne non authentifiée !");
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Personne non authentifiée !");
+                        System.out.println("Thread : " + this.toString() + " Personne non authentifiée !");
                     }
                 }
 
                 if (requeteBaseClient.getId() == BaseRequest.BIG_DATA_RESULT) {
                     reponseClient = new RequestBigDataResult();
                     RequestDoBigData requeteClient = (RequestDoBigData) requeteBaseClient;
-                    mF.getjTextFieldLogServeur().setText("Thread :" + this.toString() + "Traitement BIG DATA");
-                    System.out.println("Thread :" + this.toString() + "Traitement BIG DATA");
+                    mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Traitement BIG DATA (GET GRAPH)");
+                    System.out.println("Thread : " + this.toString() + " Traitement BIG DATA (GET GRAPH)");
 
                     //Traitement BIG DATA
                     if (requeteClient.getTypetraitement() == RequestDoBigData.CAH) {
-                        // Traitement du CAH (Faire un objet)
+                        cah.getDMCAH();
+                        ((RequestBigDataResult)reponseClient).setData(cah.getDataset());
+                        reponseClient.setStatus(true);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " CAH envoyé !");
+                        System.out.println("Thread : " + this.toString() + " CAH envoyé !");
                     }
-
+                    else
+                    {
+                        reponseClient.setStatus(false);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Erreur envoi CAH !");
+                        System.out.println("Thread : " + this.toString() + " Erreur envoi CAH !");
+                    }
+                    
                     if (requeteClient.getTypetraitement() == RequestDoBigData.ACM) {
-                        // Traitement de l'ACM (Faire un objet)
+                        acm.getDMACM();
+                        ((RequestBigDataResult)reponseClient).setData(acm.getDataset());
+                        reponseClient.setStatus(true);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " ACM envoyé !");
+                        System.out.println("Thread : " + this.toString() + " ACM envoyé !");
+                    }
+                    else
+                    {
+                        reponseClient.setStatus(false);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Erreur envoi ACM !");
+                        System.out.println("Thread : " + this.toString() + " Erreur envoi ACM !");
                     }
 
                     if (requeteClient.getTypetraitement() == RequestDoBigData.REG_CORR) {
-                        // Traitement de la REG_CORR (Faire un objet)
+                        regCor.getDMRegCor();
+                        ((RequestBigDataResult)reponseClient).setData(regCor.getDataset());
+                        reponseClient.setStatus(true);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " REG-COR envoyé !");
+                        System.out.println("Thread : " + this.toString() + " REG-COR envoyé !");
                     }
+                    else
+                    {
+                        reponseClient.setStatus(false);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Erreur envoi REG-COR !");
+                        System.out.println("Thread : " + this.toString() + " Erreur envoi REG-COR !");
+                    }
+                    
                     if (requeteClient.getTypetraitement() == RequestDoBigData.ANOVA) {
-                        // Traitement de la ANOVA (Faire un objet)
+                        anova2.getDMAnova();
+                        ((RequestBigDataResult)reponseClient).setData(anova2.getDataset());
+                        reponseClient.setStatus(true);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " ANOVA2 envoyé !");
+                        System.out.println("Thread : " + this.toString() + " ANOVA2 envoyé !");
+                    }
+                    else
+                    {
+                        reponseClient.setStatus(false);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Erreur envoi ANOVA2 !");
+                        System.out.println("Thread : " + this.toString() + " Erreur envoi ANOVA2 !");
                     }
                 }
+                
+                if (requeteBaseClient.getId() == BaseRequest.DO_BIG_DATA) {
+                    reponseClient = new RequestBigDataResult();
+                    RequestDoBigData requeteClient = (RequestDoBigData) requeteBaseClient;
+                    mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Traitement BIG DATA (REFRESH GRAPH)");
+                    System.out.println("Thread : " + this.toString() + " Traitement BIG DATA (REFRESH GRAPH)");
+
+                    //Traitement BIG DATA
+                    if (requeteClient.getTypetraitement() == RequestDoBigData.CAH) {
+                        cah.refreshCAH();
+                        ((RequestBigDataResult)reponseClient).setData(cah.getDataset());
+                        reponseClient.setStatus(true);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " CAH rafraichi et envoyé !");
+                        System.out.println("Thread : " + this.toString() + " CAH rafraichi et envoyé !");
+                    }
+                    else
+                    {
+                        reponseClient.setStatus(false);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Erreur envoi CAH !");
+                        System.out.println("Thread : " + this.toString() + " Erreur envoi CAH !");
+                    }
+                    
+                    if (requeteClient.getTypetraitement() == RequestDoBigData.ACM) {
+                        acm.refreshACM();
+                        ((RequestBigDataResult)reponseClient).setData(acm.getDataset());
+                        reponseClient.setStatus(true);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " ACM rafraichi et envoyé !");
+                        System.out.println("Thread : " + this.toString() + " ACM rafraichi et  envoyé !");
+                    }
+                    else
+                    {
+                        reponseClient.setStatus(false);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Erreur envoi ACM !");
+                        System.out.println("Thread : " + this.toString() + " Erreur envoi ACM !");
+                    }
+
+                    if (requeteClient.getTypetraitement() == RequestDoBigData.REG_CORR) {
+                        regCor.refreshRegCor();
+                        ((RequestBigDataResult)reponseClient).setData(regCor.getDataset());
+                        reponseClient.setStatus(true);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " REG-COR rafraichi et envoyé !");
+                        System.out.println("Thread : " + this.toString() + " REG-COR rafraichi et envoyé !");
+                    }
+                    else
+                    {
+                        reponseClient.setStatus(false);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Erreur envoi REG-COR !");
+                        System.out.println("Thread : " + this.toString() + " Erreur envoi REG-COR !");
+                    }
+                    
+                    if (requeteClient.getTypetraitement() == RequestDoBigData.ANOVA) {
+                        anova2.refreshAnova();
+                        ((RequestBigDataResult)reponseClient).setData(anova2.getDataset());
+                        reponseClient.setStatus(true);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " ANOVA2 rafraichi et envoyé !");
+                        System.out.println("Thread : " + this.toString() + " ANOVA2 rafraichi et envoyé !");
+                    }
+                    else
+                    {
+                        reponseClient.setStatus(false);
+                        mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Erreur envoi ANOVA2 !");
+                        System.out.println("Thread : " + this.toString() + " Erreur envoi ANOVA2 !");
+                    }
+                }
+                
                 oos.writeObject(reponseClient);
+                mF.getjTextFieldLogServeur().setText("Thread : " + this.toString() + " Objet envoyé au client !");
+                System.out.println("Thread : " + this.toString() + " Objet envoyé au client !");
             }
 
             closeConnexion();
