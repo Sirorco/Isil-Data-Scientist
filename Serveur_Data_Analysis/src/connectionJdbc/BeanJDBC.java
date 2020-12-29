@@ -6,6 +6,7 @@
 package connectionJdbc;
 
 import java.beans.*;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.*;
 import java.sql.Statement;
@@ -199,6 +200,26 @@ public class BeanJDBC implements Serializable {
         return myRs;
     }
     
+    
+    public ResultSet Update(String Table, String Conditionarg, String colonne, InputStream in){
+        java.sql.PreparedStatement pstmt = null;
+        ResultSet myRs = null;
+        
+        if (myConn != null)
+        {
+            try {
+                pstmt = myConn.prepareStatement("update " + Table + " set "+ colonne + " = ?  where " + Conditionarg);
+                pstmt.setBlob(1,in);
+                pstmt.execute();
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+                Error = exc.getMessage();
+                myRs = null;
+            }
+        }
+        
+        return myRs;
+    }
     
     public ResultSet Delete (String Table, String Conditionarg)
     {
