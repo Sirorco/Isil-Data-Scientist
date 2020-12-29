@@ -339,6 +339,8 @@ public class datamining extends javax.swing.JFrame {
     
     private BeanJDBC beanJdbc;
     private BeanRServe beanRServ;
+    private boolean connectedToJDBC = false;
+    private boolean connectedToRServe = false;
     
     private void RefreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RefreshButtonActionPerformed
        
@@ -429,6 +431,7 @@ public class datamining extends javax.swing.JFrame {
     
     
     public void connectToJDBC(){
+        if(connectedToJDBC) return;
         //Recherche des infos dans le fichier properties
         ResourceBundle bundle = ResourceBundle.getBundle("properties.fichConfig");
         String name = bundle.getString("sgbd.name");
@@ -443,10 +446,13 @@ public class datamining extends javax.swing.JFrame {
         }
         name = "jdbc:mysql://82.212.170.117:3306/bd_mouvements?useUnicode=true &useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false& serverTimezone=UTC";
         beanJdbc = new BeanJDBC(name, user, mdp);
+        connectedToJDBC = true;
     }
     
     public void connectToRServ(){
+        if(connectedToRServe) return;
         beanRServ = new BeanRServe();
+        connectedToRServe = true;
     }
 
     private void debugResultSet(ResultSet rs){
@@ -583,6 +589,7 @@ public class datamining extends javax.swing.JFrame {
     private void refreshCAH(){
         connectToJDBC();
         connectToRServ();
+        
         //Requête SQL pour former la table comprenant "destination_villeDepart, destination_villeArrivee, count(destination_villeDepart)"
         ResultSet rs = beanJdbc.ExecuteQuery(""
                 + "select "
@@ -593,6 +600,7 @@ public class datamining extends javax.swing.JFrame {
                 + "group by "
                 + "     mois");
         debugResultSet(rs);
+        
         
         //Envoie de la table à RServe
         exportResultasDatasetInRServe(rs,"Benefices");
@@ -705,20 +713,21 @@ public class datamining extends javax.swing.JFrame {
         //Modification des type de col
         beanRServ.voidEval("names(Routes)[1]<-'Depart'");
         beanRServ.voidEval("names(Routes)[2]<-'Destination'");
-        beanRServ.voidEval("Routes <- Routes[sample(nrow(Routes),500),]");
+        beanRServ.voidEval("Routes <- Routes[sample(nrow(Routes),200),]");
         
         beanRServ.eval("library(FactoMineR)");
+        beanRServ.eval("library('factoextra')");
         
         //Préparation du fichier image dans RServe
         beanRServ.eval("png(file='Routes.png',width=1400,height=800)");
         //Création du graph
-        beanRServ.parseAndEval("acm <- MCA(Routes)");
-        beanRServ.parseAndEval("plot(acm);dev.off()");
+        beanRServ.parseAndEval("acm <- MCA(Routes, graph=FALSE)"); 
+        beanRServ.parseAndEval("print(fviz_mca_var(acm, repel = TRUE));dev.off()");
         //Import du graph 
         REXP xp = beanRServ.parseAndEval("r=readBin('Routes.png','raw',1400*800)");
-        System.out.println(xp.toDebugString());
-        //xp = beanRServ.parseAndEval("r=readBin('Routes.png','raw',1400*800)");
+        
         beanRServ.parseAndEval("unlink('Routes.png');r");
+        
         Image img = null;
         try {
             img = Toolkit.getDefaultToolkit().createImage(xp.asBytes());
@@ -730,6 +739,7 @@ public class datamining extends javax.swing.JFrame {
         //Affichage du graph
         ImageLabelACM.setIcon(new ImageIcon(img));
         ImageLabelACM.repaint();
+        
         
         //update graph
         InputStream fis;
