@@ -126,24 +126,34 @@ public class MainWindow extends javax.swing.JFrame {
         viewPane.setLayout(new java.awt.BorderLayout());
 
         cahPane.setLayout(new java.awt.BorderLayout());
+
+        cahTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         cahPane.add(cahTitle, java.awt.BorderLayout.NORTH);
 
         java.awt.GridBagLayout cahGraphsPaneLayout = new java.awt.GridBagLayout();
         cahGraphsPaneLayout.columnWeights = new double[] {1.0, 1.0};
         cahGraphsPaneLayout.rowWeights = new double[] {4.0, 1.0};
         cahGraphsPane.setLayout(cahGraphsPaneLayout);
+
+        cahPlot1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         cahGraphsPane.add(cahPlot1, gridBagConstraints);
+
+        cahPlot2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         cahGraphsPane.add(cahPlot2, gridBagConstraints);
+
+        cahText1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         cahGraphsPane.add(cahText1, gridBagConstraints);
+
+        cahText2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
@@ -152,7 +162,11 @@ public class MainWindow extends javax.swing.JFrame {
         cahPane.add(cahGraphsPane, java.awt.BorderLayout.CENTER);
 
         jPanel1.setLayout(new java.awt.GridLayout(2, 1));
+
+        cahGlobal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jPanel1.add(cahGlobal);
+
+        cahDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jPanel1.add(cahDate);
 
         cahPane.add(jPanel1, java.awt.BorderLayout.SOUTH);
@@ -160,23 +174,33 @@ public class MainWindow extends javax.swing.JFrame {
         viewTabbedPane.addTab("Bénéfices mensuels", cahPane);
 
         anovaPane.setLayout(new java.awt.BorderLayout());
+
+        anovaTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         anovaPane.add(anovaTitle, java.awt.BorderLayout.NORTH);
 
         java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
         jPanel2Layout.rowWeights = new double[] {4.0, 1.0, 1.0, 1.0};
         jPanel2.setLayout(jPanel2Layout);
+
+        anovaPlot.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         jPanel2.add(anovaPlot, gridBagConstraints);
+
+        anovaText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         jPanel2.add(anovaText, gridBagConstraints);
+
+        anovaGlobal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         jPanel2.add(anovaGlobal, gridBagConstraints);
+
+        anovaDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -187,23 +211,33 @@ public class MainWindow extends javax.swing.JFrame {
         viewTabbedPane.addTab("Routes commerciales", anovaPane);
 
         acmPane.setLayout(new java.awt.BorderLayout());
+
+        acmTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         acmPane.add(acmTitle, java.awt.BorderLayout.NORTH);
 
         java.awt.GridBagLayout jPanel3Layout = new java.awt.GridBagLayout();
         jPanel3Layout.rowWeights = new double[] {4.0, 1.0, 1.0, 1.0};
         jPanel3.setLayout(jPanel3Layout);
+
+        acmPlot.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         jPanel3.add(acmPlot, gridBagConstraints);
+
+        acmText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         jPanel3.add(acmText, gridBagConstraints);
+
+        acmGlobal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         jPanel3.add(acmGlobal, gridBagConstraints);
+
+        acmDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -214,23 +248,33 @@ public class MainWindow extends javax.swing.JFrame {
         viewTabbedPane.addTab("Routes particulières", acmPane);
 
         regPane.setLayout(new java.awt.BorderLayout());
+
+        regTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         regPane.add(regTitle, java.awt.BorderLayout.NORTH);
 
         java.awt.GridBagLayout jPanel4Layout = new java.awt.GridBagLayout();
         jPanel4Layout.rowWeights = new double[] {4.0, 1.0, 1.0, 1.0};
         jPanel4.setLayout(jPanel4Layout);
+
+        regPlot.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         jPanel4.add(regPlot, gridBagConstraints);
+
+        regText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         jPanel4.add(regText, gridBagConstraints);
+
+        regGlobal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         jPanel4.add(regGlobal, gridBagConstraints);
+
+        regDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
