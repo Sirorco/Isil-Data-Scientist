@@ -71,7 +71,7 @@ public class Cah extends DataminingProcessing {
             
             rs.next();
             getDataset().put(RequestBigDataResult.CAH_PLOT_TWO_TEXT, rs.getString("commentaire"));
-            
+            is = rs.getBinaryStream("graph");
             
             try {
                 graph = new byte[is.available()];

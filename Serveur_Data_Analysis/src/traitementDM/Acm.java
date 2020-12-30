@@ -82,13 +82,14 @@ public class Acm extends DataminingProcessing {
         getBeanRServ().voidEval("Routes <- Routes[sample(nrow(Routes),200),]");
         
         getBeanRServ().eval("library(FactoMineR)");
-        getBeanRServ().eval("library('factoextra')");
+        //getBeanRServ().eval("library('factoextra')");
         
         //Préparation du fichier image dans RServe
         getBeanRServ().eval("png(file='Routes.png',width=1400,height=800)");
         //Création du graph
         getBeanRServ().parseAndEval("acm <- MCA(Routes, graph=FALSE)"); 
-        getBeanRServ().parseAndEval("print(fviz_mca_var(acm, repel = TRUE));dev.off()");
+        //getBeanRServ().parseAndEval("print(fviz_mca_var(acm, repel = TRUE));dev.off()");
+        getBeanRServ().parseAndEval("print(plot(acm, invisible='ind'));dev.off()");
         //Import du graph 
         REXP xp = getBeanRServ().parseAndEval("r=readBin('Routes.png','raw',1400*800)");
         
