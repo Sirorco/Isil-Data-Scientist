@@ -33,16 +33,7 @@ public abstract class DataminingProcessing {
         String name = bundle.getString("sgbd.name");
         String user = bundle.getString("sgbd.user");
         String mdp = bundle.getString("sgbd.mdp");
-
-        //Chargement du driver de MYSQL
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        name = "jdbc:mysql://82.212.170.117:3306/bd_mouvements?useUnicode=true &useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false& serverTimezone=UTC";
         beanJdbc = new BeanJDBC(name, user, mdp);
-        
         beanRServ = new BeanRServe();
         dataset = new Hashtable();
     }
