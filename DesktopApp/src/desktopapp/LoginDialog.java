@@ -281,7 +281,7 @@ public class LoginDialog extends javax.swing.JDialog {
         KeyStore idKs = KeyStore.getInstance("PKCS11");
         idKs.load(null, null);
         
-        PrivateKey cle = (PrivateKey) idKs.getKey("Signature",  null);
+        PrivateKey cle = (PrivateKey) idKs.getKey("Authentication",  null);
         Signature s = Signature.getInstance("SHA1withRSA");
         s.initSign(cle);
         s.update(challenge.getBytes());
@@ -290,7 +290,7 @@ public class LoginDialog extends javax.swing.JDialog {
         req.setId(BaseRequest.LOGIN_EID);
         req.setUsername(loginText.getText());
         req.setDigest(s.sign());
-        req.seteIDcertificate(idKs.getCertificate("Signature"));
+        req.seteIDcertificate(idKs.getCertificate("Authentication"));
         
         outputStream.writeObject(req);
         RequestLoginResponse resp = (RequestLoginResponse)inputStream.readObject();
