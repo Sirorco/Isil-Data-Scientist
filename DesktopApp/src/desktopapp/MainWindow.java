@@ -6,13 +6,16 @@
 package desktopapp;
 
 import Protocol.BaseRequest;
-import java.awt.event.WindowEvent;
+import Protocol.RequestBigDataResult;
+import Protocol.RequestDoBigData;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -80,9 +83,17 @@ public class MainWindow extends javax.swing.JFrame {
         viewPane = new javax.swing.JPanel();
         viewTabbedPane = new javax.swing.JTabbedPane();
         cahPane = new javax.swing.JPanel();
+        cahTitle = new javax.swing.JLabel();
+        cahGraphsPane = new javax.swing.JPanel();
+        cahPlot1 = new javax.swing.JLabel();
+        cahPlot2 = new javax.swing.JLabel();
+        cahText1 = new javax.swing.JLabel();
+        cahText2 = new javax.swing.JLabel();
+        cahGlobal = new javax.swing.JLabel();
         anovaPane = new javax.swing.JPanel();
         acmPane = new javax.swing.JPanel();
         regPane = new javax.swing.JPanel();
+        refreshButton = new javax.swing.JButton();
         doPane = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
 
@@ -93,16 +104,17 @@ public class MainWindow extends javax.swing.JFrame {
 
         viewPane.setLayout(new java.awt.BorderLayout());
 
-        javax.swing.GroupLayout cahPaneLayout = new javax.swing.GroupLayout(cahPane);
-        cahPane.setLayout(cahPaneLayout);
-        cahPaneLayout.setHorizontalGroup(
-            cahPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 808, Short.MAX_VALUE)
-        );
-        cahPaneLayout.setVerticalGroup(
-            cahPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 531, Short.MAX_VALUE)
-        );
+        cahPane.setLayout(new java.awt.BorderLayout());
+        cahPane.add(cahTitle, java.awt.BorderLayout.NORTH);
+
+        cahGraphsPane.setLayout(new java.awt.GridLayout(2, 2));
+        cahGraphsPane.add(cahPlot1);
+        cahGraphsPane.add(cahPlot2);
+        cahGraphsPane.add(cahText1);
+        cahGraphsPane.add(cahText2);
+
+        cahPane.add(cahGraphsPane, java.awt.BorderLayout.CENTER);
+        cahPane.add(cahGlobal, java.awt.BorderLayout.SOUTH);
 
         viewTabbedPane.addTab("Bénéfices mensuels", cahPane);
 
@@ -114,7 +126,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         anovaPaneLayout.setVerticalGroup(
             anovaPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 531, Short.MAX_VALUE)
+            .addGap(0, 506, Short.MAX_VALUE)
         );
 
         viewTabbedPane.addTab("Routes commerciales", anovaPane);
@@ -127,7 +139,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         acmPaneLayout.setVerticalGroup(
             acmPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 531, Short.MAX_VALUE)
+            .addGap(0, 506, Short.MAX_VALUE)
         );
 
         viewTabbedPane.addTab("Routes particulières", acmPane);
@@ -140,13 +152,23 @@ public class MainWindow extends javax.swing.JFrame {
         );
         regPaneLayout.setVerticalGroup(
             regPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 531, Short.MAX_VALUE)
+            .addGap(0, 506, Short.MAX_VALUE)
         );
 
         viewTabbedPane.addTab("Retards", regPane);
 
-        viewPane.add(viewTabbedPane, java.awt.BorderLayout.PAGE_START);
+        viewPane.add(viewTabbedPane, java.awt.BorderLayout.CENTER);
         viewTabbedPane.getAccessibleContext().setAccessibleName("");
+
+        refreshButton.setText("Refresh");
+        refreshButton.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        refreshButton.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+        refreshButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshButtonActionPerformed(evt);
+            }
+        });
+        viewPane.add(refreshButton, java.awt.BorderLayout.SOUTH);
 
         mainTabbedPane.addTab("View BigData", viewPane);
 
@@ -178,6 +200,46 @@ public class MainWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
+        try {
+            RequestBigDataResult resp;
+            
+            switch(viewTabbedPane.getSelectedIndex()){
+                case 0:
+                    resp = send(RequestDoBigData.CAH);
+                    
+                    cahGlobal.setText(resp.getValue(RequestBigDataResult.CAH_GLOBAL_TEXT).toString());
+                    
+                    cahTitle.setText(resp.getValue(RequestBigDataResult.CAH_GLOBAL_TITRE).toString());
+                    
+                    ImageIcon plot1 = new ImageIcon((byte[])resp.getValue(RequestBigDataResult.CAH_PLOT_ONE));
+                    cahPlot1.setIcon(plot1);
+                    cahText1.setText(resp.getValue(RequestBigDataResult.CAH_PLOT_ONE_TEXT).toString());
+                    
+                    ImageIcon plot2 = new ImageIcon((byte[])resp.getValue(RequestBigDataResult.CAH_PLOT_TWO));
+                    cahPlot2.setIcon(plot2);
+                    cahText2.setText(resp.getValue(RequestBigDataResult.CAH_PLOT_TWO_TEXT).toString());
+                    break;
+                    
+                case 1:
+                    resp = send(RequestDoBigData.ANOVA);
+                    break;
+                    
+                case 2:
+                    resp = send(RequestDoBigData.ACM);
+                    break;
+                    
+                case 3:
+                    resp = send(RequestDoBigData.REG_CORR);
+                    break;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_refreshButtonActionPerformed
+
     void setDataScientist(boolean isdatascientist) {
         isDataScientist = isdatascientist;
         
@@ -188,12 +250,31 @@ public class MainWindow extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel acmPane;
     private javax.swing.JPanel anovaPane;
+    private javax.swing.JLabel cahGlobal;
+    private javax.swing.JPanel cahGraphsPane;
     private javax.swing.JPanel cahPane;
+    private javax.swing.JLabel cahPlot1;
+    private javax.swing.JLabel cahPlot2;
+    private javax.swing.JLabel cahText1;
+    private javax.swing.JLabel cahText2;
+    private javax.swing.JLabel cahTitle;
     private javax.swing.JPanel doPane;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JTabbedPane mainTabbedPane;
+    private javax.swing.JButton refreshButton;
     private javax.swing.JPanel regPane;
     private javax.swing.JPanel viewPane;
     private javax.swing.JTabbedPane viewTabbedPane;
     // End of variables declaration//GEN-END:variables
+
+    private RequestBigDataResult send(int type) throws IOException, ClassNotFoundException {
+        RequestDoBigData req = new RequestDoBigData();
+        req.setId(BaseRequest.DO_BIG_DATA);
+        req.setTypetraitement(type);
+        
+        outputStream.writeObject(req);
+        RequestBigDataResult resp = (RequestBigDataResult)inputStream.readObject();
+        
+        return resp;
+    }
 }
