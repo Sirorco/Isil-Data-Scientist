@@ -84,6 +84,10 @@ public class TraitementClient implements Runnable {
         }
         beanJdbc = new BeanJDBC(name, user, mdp);
         beanRServe = new BeanRServe();
+        acm = new Acm(beanJdbc, beanRServe);
+        anova2 = new Anova2(beanJdbc, beanRServe);
+        cah = new Cah(beanJdbc, beanRServe);
+        regCor = new RegCor(beanJdbc, beanRServe);
         
     }
 
