@@ -76,41 +76,79 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        mainTabbedPane = new javax.swing.JTabbedPane();
         viewPane = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        viewTabbedPane = new javax.swing.JTabbedPane();
+        cahPane = new javax.swing.JPanel();
+        anovaPane = new javax.swing.JPanel();
+        acmPane = new javax.swing.JPanel();
+        regPane = new javax.swing.JPanel();
         doPane = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("DesktoppApp");
 
-        jTabbedPane1.setName("View BigData"); // NOI18N
+        mainTabbedPane.setName("View BigData"); // NOI18N
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel2.setText("TO DO");
+        viewPane.setLayout(new java.awt.BorderLayout());
 
-        javax.swing.GroupLayout viewPaneLayout = new javax.swing.GroupLayout(viewPane);
-        viewPane.setLayout(viewPaneLayout);
-        viewPaneLayout.setHorizontalGroup(
-            viewPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(viewPaneLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addContainerGap(743, Short.MAX_VALUE))
+        javax.swing.GroupLayout cahPaneLayout = new javax.swing.GroupLayout(cahPane);
+        cahPane.setLayout(cahPaneLayout);
+        cahPaneLayout.setHorizontalGroup(
+            cahPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 808, Short.MAX_VALUE)
         );
-        viewPaneLayout.setVerticalGroup(
-            viewPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(viewPaneLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addContainerGap(526, Short.MAX_VALUE))
+        cahPaneLayout.setVerticalGroup(
+            cahPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 531, Short.MAX_VALUE)
         );
 
-        jLabel2.getAccessibleContext().setAccessibleName("");
-        jLabel2.getAccessibleContext().setAccessibleParent(jTabbedPane1);
+        viewTabbedPane.addTab("Bénéfices mensuels", cahPane);
 
-        jTabbedPane1.addTab("View BigData", viewPane);
+        javax.swing.GroupLayout anovaPaneLayout = new javax.swing.GroupLayout(anovaPane);
+        anovaPane.setLayout(anovaPaneLayout);
+        anovaPaneLayout.setHorizontalGroup(
+            anovaPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 808, Short.MAX_VALUE)
+        );
+        anovaPaneLayout.setVerticalGroup(
+            anovaPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 531, Short.MAX_VALUE)
+        );
+
+        viewTabbedPane.addTab("Routes commerciales", anovaPane);
+
+        javax.swing.GroupLayout acmPaneLayout = new javax.swing.GroupLayout(acmPane);
+        acmPane.setLayout(acmPaneLayout);
+        acmPaneLayout.setHorizontalGroup(
+            acmPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 808, Short.MAX_VALUE)
+        );
+        acmPaneLayout.setVerticalGroup(
+            acmPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 531, Short.MAX_VALUE)
+        );
+
+        viewTabbedPane.addTab("Routes particulières", acmPane);
+
+        javax.swing.GroupLayout regPaneLayout = new javax.swing.GroupLayout(regPane);
+        regPane.setLayout(regPaneLayout);
+        regPaneLayout.setHorizontalGroup(
+            regPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 808, Short.MAX_VALUE)
+        );
+        regPaneLayout.setVerticalGroup(
+            regPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 531, Short.MAX_VALUE)
+        );
+
+        viewTabbedPane.addTab("Retards", regPane);
+
+        viewPane.add(viewTabbedPane, java.awt.BorderLayout.PAGE_START);
+        viewTabbedPane.getAccessibleContext().setAccessibleName("");
+
+        mainTabbedPane.addTab("View BigData", viewPane);
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel3.setText("TO DO");
@@ -132,10 +170,10 @@ public class MainWindow extends javax.swing.JFrame {
                 .addContainerGap(526, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Do BigData", doPane);
+        mainTabbedPane.addTab("Do BigData", doPane);
 
-        getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
-        jTabbedPane1.getAccessibleContext().setAccessibleName("View BigData");
+        getContentPane().add(mainTabbedPane, java.awt.BorderLayout.CENTER);
+        mainTabbedPane.getAccessibleContext().setAccessibleName("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -143,15 +181,19 @@ public class MainWindow extends javax.swing.JFrame {
     void setDataScientist(boolean isdatascientist) {
         isDataScientist = isdatascientist;
         
-        jTabbedPane1.setEnabledAt(1, isdatascientist);
+        mainTabbedPane.setEnabledAt(1, isdatascientist);
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel acmPane;
+    private javax.swing.JPanel anovaPane;
+    private javax.swing.JPanel cahPane;
     private javax.swing.JPanel doPane;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTabbedPane mainTabbedPane;
+    private javax.swing.JPanel regPane;
     private javax.swing.JPanel viewPane;
+    private javax.swing.JTabbedPane viewTabbedPane;
     // End of variables declaration//GEN-END:variables
 }
