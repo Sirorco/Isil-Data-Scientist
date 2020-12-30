@@ -8,11 +8,11 @@ package desktopapp;
 import Protocol.BaseRequest;
 import Protocol.RequestBigDataResult;
 import Protocol.RequestDoBigData;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.Timestamp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -78,6 +78,7 @@ public class MainWindow extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         mainTabbedPane = new javax.swing.JTabbedPane();
         viewPane = new javax.swing.JPanel();
@@ -89,8 +90,16 @@ public class MainWindow extends javax.swing.JFrame {
         cahPlot2 = new javax.swing.JLabel();
         cahText1 = new javax.swing.JLabel();
         cahText2 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
         cahGlobal = new javax.swing.JLabel();
+        cahDate = new javax.swing.JLabel();
         anovaPane = new javax.swing.JPanel();
+        anovaTitle = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        anovaPlot = new javax.swing.JLabel();
+        anovaText = new javax.swing.JLabel();
+        anovaGlobal = new javax.swing.JLabel();
+        anovaDate = new javax.swing.JLabel();
         acmPane = new javax.swing.JPanel();
         regPane = new javax.swing.JPanel();
         refreshButton = new javax.swing.JButton();
@@ -107,27 +116,61 @@ public class MainWindow extends javax.swing.JFrame {
         cahPane.setLayout(new java.awt.BorderLayout());
         cahPane.add(cahTitle, java.awt.BorderLayout.NORTH);
 
-        cahGraphsPane.setLayout(new java.awt.GridLayout(2, 2));
-        cahGraphsPane.add(cahPlot1);
-        cahGraphsPane.add(cahPlot2);
-        cahGraphsPane.add(cahText1);
-        cahGraphsPane.add(cahText2);
+        java.awt.GridBagLayout cahGraphsPaneLayout = new java.awt.GridBagLayout();
+        cahGraphsPaneLayout.columnWeights = new double[] {1.0, 1.0};
+        cahGraphsPaneLayout.rowWeights = new double[] {4.0, 1.0};
+        cahGraphsPane.setLayout(cahGraphsPaneLayout);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        cahGraphsPane.add(cahPlot1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        cahGraphsPane.add(cahPlot2, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        cahGraphsPane.add(cahText1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        cahGraphsPane.add(cahText2, gridBagConstraints);
 
         cahPane.add(cahGraphsPane, java.awt.BorderLayout.CENTER);
-        cahPane.add(cahGlobal, java.awt.BorderLayout.SOUTH);
+
+        jPanel1.setLayout(new java.awt.GridLayout(2, 1));
+        jPanel1.add(cahGlobal);
+        jPanel1.add(cahDate);
+
+        cahPane.add(jPanel1, java.awt.BorderLayout.SOUTH);
 
         viewTabbedPane.addTab("Bénéfices mensuels", cahPane);
 
-        javax.swing.GroupLayout anovaPaneLayout = new javax.swing.GroupLayout(anovaPane);
-        anovaPane.setLayout(anovaPaneLayout);
-        anovaPaneLayout.setHorizontalGroup(
-            anovaPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 808, Short.MAX_VALUE)
-        );
-        anovaPaneLayout.setVerticalGroup(
-            anovaPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 506, Short.MAX_VALUE)
-        );
+        anovaPane.setLayout(new java.awt.BorderLayout());
+        anovaPane.add(anovaTitle, java.awt.BorderLayout.NORTH);
+
+        java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
+        jPanel2Layout.rowWeights = new double[] {4.0, 1.0, 1.0, 1.0};
+        jPanel2.setLayout(jPanel2Layout);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        jPanel2.add(anovaPlot, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        jPanel2.add(anovaText, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        jPanel2.add(anovaGlobal, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        jPanel2.add(anovaDate, gridBagConstraints);
+
+        anovaPane.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         viewTabbedPane.addTab("Routes commerciales", anovaPane);
 
@@ -139,7 +182,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         acmPaneLayout.setVerticalGroup(
             acmPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 506, Short.MAX_VALUE)
+            .addGap(0, 754, Short.MAX_VALUE)
         );
 
         viewTabbedPane.addTab("Routes particulières", acmPane);
@@ -152,7 +195,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         regPaneLayout.setVerticalGroup(
             regPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 506, Short.MAX_VALUE)
+            .addGap(0, 754, Short.MAX_VALUE)
         );
 
         viewTabbedPane.addTab("Retards", regPane);
@@ -189,7 +232,7 @@ public class MainWindow extends javax.swing.JFrame {
             .addGroup(doPaneLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel3)
-                .addContainerGap(526, Short.MAX_VALUE))
+                .addContainerGap(774, Short.MAX_VALUE))
         );
 
         mainTabbedPane.addTab("Do BigData", doPane);
@@ -219,10 +262,22 @@ public class MainWindow extends javax.swing.JFrame {
                     ImageIcon plot2 = new ImageIcon((byte[])resp.getValue(RequestBigDataResult.CAH_PLOT_TWO));
                     cahPlot2.setIcon(plot2);
                     cahText2.setText(resp.getValue(RequestBigDataResult.CAH_PLOT_TWO_TEXT).toString());
+                    
+                    cahDate.setText(((Timestamp)resp.getValue(RequestBigDataResult.CAH_DATE)).toString());
                     break;
                     
                 case 1:
                     resp = send(RequestDoBigData.ANOVA);
+                    
+                    anovaGlobal.setText(resp.getValue(RequestBigDataResult.ANOVA2_GLOBAL_TEXT).toString());
+                    
+                    anovaTitle.setText(resp.getValue(RequestBigDataResult.ANOVA2_GLOBAL_TITRE).toString());
+                    
+                    ImageIcon plot = new ImageIcon((byte[])resp.getValue(RequestBigDataResult.ANOVA2_PLOT_ONE));
+                    anovaPlot.setIcon(plot);
+                    anovaText.setText(resp.getValue(RequestBigDataResult.ANOVA2_PLOT_ONE_TEXT).toString());
+                    
+                    anovaDate.setText(((Timestamp)resp.getValue(RequestBigDataResult.ANOVA2_DATE)).toString());
                     break;
                     
                 case 2:
@@ -249,7 +304,13 @@ public class MainWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel acmPane;
+    private javax.swing.JLabel anovaDate;
+    private javax.swing.JLabel anovaGlobal;
     private javax.swing.JPanel anovaPane;
+    private javax.swing.JLabel anovaPlot;
+    private javax.swing.JLabel anovaText;
+    private javax.swing.JLabel anovaTitle;
+    private javax.swing.JLabel cahDate;
     private javax.swing.JLabel cahGlobal;
     private javax.swing.JPanel cahGraphsPane;
     private javax.swing.JPanel cahPane;
@@ -260,6 +321,8 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JLabel cahTitle;
     private javax.swing.JPanel doPane;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane mainTabbedPane;
     private javax.swing.JButton refreshButton;
     private javax.swing.JPanel regPane;
