@@ -109,7 +109,7 @@ public class RegCor extends DataminingProcessing {
         InputStream fis;
         try {
             fis = new ByteArrayInputStream(xp.asBytes());
-            rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 1", "graph", fis);    
+            getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 1", "graph", fis);    
             //Ajout du graph un à la hashtable
             getDataset().put(RequestBigDataResult.REGCORR_PLOT_ONE, fis);
         } catch (REXPMismatchException ex) {

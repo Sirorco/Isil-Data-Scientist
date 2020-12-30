@@ -87,19 +87,11 @@ public class Acm extends DataminingProcessing {
         
         getBeanRServ().parseAndEval("unlink('Routes.png');r");
         
-        Image img = null;
-        try {
-            img = Toolkit.getDefaultToolkit().createImage(xp.asBytes());
-        } catch (REXPMismatchException ex) {
-            Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
         //update graph
         InputStream fis;
         try {
             fis = new ByteArrayInputStream(xp.asBytes());
-            rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 5", "graph", fis);    
+            getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 5", "graph", fis);    
             //Ajout du graph un à la hashtable
             getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, fis);
         } catch (REXPMismatchException ex) {
