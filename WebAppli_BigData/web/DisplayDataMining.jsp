@@ -4,6 +4,7 @@
     Author     : Thomas
 --%>
 
+<%@page import="java.util.Base64"%>
 <%@page import="java.io.ByteArrayInputStream"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.sql.Timestamp"%>
@@ -60,10 +61,14 @@
                     String b64 = javax.xml.bind.DatatypeConverter.printBase64Binary(data);
                     String comment1 = (String) resp.getValue(RequestBigDataResult.REGCORR_PLOT_ONE_TEXT);
                     String ccl = (String) resp.getValue(RequestBigDataResult.REGCORR_GLOBAL_TEXT);
+                    
+                    String bimage= "<img src=\"data:image/png;base64,";
+                    bimage += b64;
+                    bimage +="\" width=\"240\" height=\"300\"/>";
                     %> <h4>Regression-Correlation</h4>
                     <h4>Titre : <%=title%></h4>
                     <h4>Date de réalisation du traitement : <%=Date%></h4>
-                    <img src="data:image/jpg;base64,${b64}" width="240" height="300"/>
+                    <%=bimage%>
                     <h4><%=comment1%></h4>
                     <h4><%=ccl%></h4>
                     <%
@@ -77,10 +82,15 @@
                     String b64 = javax.xml.bind.DatatypeConverter.printBase64Binary(data);
                     String comment1 = (String) resp.getValue(RequestBigDataResult.ANOVA2_PLOT_ONE_TEXT);
                     String ccl = (String) resp.getValue(RequestBigDataResult.ANOVA2_GLOBAL_TEXT);
+
+                    String bimage= "<img src=\"data:image/png;base64,";
+                    bimage += b64;
+                    bimage +="\" width=\"240\" height=\"300\"/>";
+
                     %> <h4>Anova2</h4>
                     <h4>Titre : <%=title%></h4>
                     <h4>Date de réalisation du traitement : <%=Date%></h4>
-                    <img src="data:image/jpg;base64,${b64}" width="240" height="300"/>
+                    <%=bimage%>
                     <h4><%=comment1%></h4>
                     <h4><%=ccl%></h4>
                     <%
@@ -90,14 +100,20 @@
                     Timestamp DateTime = (Timestamp) resp.getValue(RequestBigDataResult.ACM_DATE);
                     String Date = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(DateTime);
                     String title = (String) resp.getValue(RequestBigDataResult.ACM_GLOBAL_TITRE);
-                    byte [] data = (byte []) resp.getValue(RequestBigDataResult.ACM_PLOT_ONE);
+                    byte [] data = (byte []) resp.getValue(RequestBigDataResult.ACM_PLOT_ONE);      
+                    
                     String b64 = javax.xml.bind.DatatypeConverter.printBase64Binary(data);
                     String comment1 = (String) resp.getValue(RequestBigDataResult.ACM_PLOT_ONE_TEXT);
                     String ccl = (String) resp.getValue(RequestBigDataResult.ACM_GLOBAL_TEXT);
+                    
+                    String bimage= "<img src=\"data:image/png;base64,";
+                    bimage += b64;
+                    bimage +="\" width=\"240\" height=\"300\"/>";
+                    
                     %> <h4>ACM</h4>
                     <h4>Titre : <%=title%></h4>
                     <h4>Date de réalisation du traitement : <%=Date%></h4>
-                    <img src="data:image/jpg;base64,${b64}" width="240" height="300"/>
+                    <%=bimage%>
                     <h4><%=comment1%></h4>
                     <h4><%=ccl%></h4>
                     <%
@@ -107,19 +123,32 @@
                     Timestamp DateTime = (Timestamp) resp.getValue(RequestBigDataResult.CAH_DATE);
                     String Date = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(DateTime);
                     String title = (String) resp.getValue(RequestBigDataResult.CAH_GLOBAL_TITRE);
+
                     byte [] data = (byte []) resp.getValue(RequestBigDataResult.CAH_PLOT_ONE);
                     String b64_img1 = javax.xml.bind.DatatypeConverter.printBase64Binary(data);
                     String comment1 = (String) resp.getValue(RequestBigDataResult.CAH_PLOT_ONE_TEXT);
-                    data = (byte []) resp.getValue(RequestBigDataResult.CAH_PLOT_TWO);
-                    String b64_img2 = javax.xml.bind.DatatypeConverter.printBase64Binary(data);
+                    
+                    byte [] data2 = (byte []) resp.getValue(RequestBigDataResult.CAH_PLOT_TWO);
+                    String b64_img2 = javax.xml.bind.DatatypeConverter.printBase64Binary(data2);
                     String comment2 = (String) resp.getValue(RequestBigDataResult.CAH_PLOT_TWO_TEXT);
+
                     String ccl = (String) resp.getValue(RequestBigDataResult.REGCORR_GLOBAL_TEXT);
+
+
+                    String bimage1= "<img src=\"data:image/png;base64,";
+                    bimage1 += b64_img1;
+                    bimage1 +="\" width=\"240\" height=\"300\"/>";
+
+                    String bimage2= "<img src=\"data:image/png;base64,";
+                    bimage2 += b64_img2;
+                    bimage2 +="\" width=\"240\" height=\"300\"/>";
+
                     %> <h4>CAH</h4>
                     <h4>Titre : <%=title%></h4>
                     <h4>Date de réalisation du traitement : <%=Date%></h4>
-                    <img src="data:image/jpg;base64,${b64_img1}" width="240" height="300"/>
+                    <%=bimage1%>
                     <h4><%=comment1%></h4>
-                    <img src="data:image/jpg;base64,${b64_img2}" width="240" height="300"/>
+                    <%=bimage2%>
                     <h4><%=comment2%></h4>
                     <h4><%=ccl%></h4>
                     <%

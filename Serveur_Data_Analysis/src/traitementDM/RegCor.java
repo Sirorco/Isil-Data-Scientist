@@ -11,6 +11,7 @@ import connectionRServe.BeanRServe;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,7 +41,7 @@ public class RegCor extends DataminingProcessing {
     public void getDMRegCor(){
         ResultSet rs = getBeanJdbc().ExecuteQuery(""
                 + "select "
-                + "     titre, fonction, conclusionGenerale, commentaire, graph "
+                + "     titre, fonction, conclusionGenerale, commentaire, graph, maj "
                 + "from "
                 + "     bd_decisions.analyse a, bd_decisions.analyse_graph ag "
                 + "where "
@@ -53,8 +54,18 @@ public class RegCor extends DataminingProcessing {
             getDataset().put(RequestBigDataResult.REGCORR_GLOBAL_TITRE, rs.getString("titre"));
             getDataset().put(RequestBigDataResult.REGCORR_PLOT_ONE_TEXT, rs.getString("commentaire"));
             getDataset().put(RequestBigDataResult.REGCORR_GLOBAL_TEXT, rs.getString("conclusionGenerale"));
+            
             //Ajout du graph un à la hashtable
-            getDataset().put(RequestBigDataResult.REGCORR_PLOT_ONE, rs.getBinaryStream("graph"));
+            InputStream is = rs.getBinaryStream("graph");
+            byte[] graph;
+            try {
+                graph = new byte[is.available()];
+                is.read(graph);
+                getDataset().put(RequestBigDataResult.REGCORR_PLOT_ONE, graph);
+            } catch (IOException ex) {
+                Logger.getLogger(Acm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
         } catch (SQLException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -70,7 +81,7 @@ public class RegCor extends DataminingProcessing {
                 //+ "     monthname(dateDepartPrevu) as 'mois', "
                 + "     w.nDockers as 'ndockers'"
                 + "from "
-                + "     transports t,"
+                + "     bd_mouvements.transports t,"
                 + "     bd_compta.workingdockers w "
                 + "where"
                 + "     monthname(t.dateDepartPrevu) like w.mois "
@@ -111,7 +122,8 @@ public class RegCor extends DataminingProcessing {
             fis = new ByteArrayInputStream(xp.asBytes());
             getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 1", "graph", fis);    
             //Ajout du graph un à la hashtable
-            getDataset().put(RequestBigDataResult.REGCORR_PLOT_ONE, fis);
+            byte[] graph = xp.asBytes();
+            getDataset().put(RequestBigDataResult.REGCORR_PLOT_ONE, graph);
         } catch (REXPMismatchException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -119,7 +131,7 @@ public class RegCor extends DataminingProcessing {
         //Select des datas dans mysql
         rs = getBeanJdbc().ExecuteQuery(""
                 + "select "
-                + "     titre, fonction, conclusionGenerale, commentaire "
+                + "     titre, fonction, conclusionGenerale, commentaire, maj "
                 + "from "
                 + "     bd_decisions.analyse a, bd_decisions.analyse_graph ag "
                 + "where "

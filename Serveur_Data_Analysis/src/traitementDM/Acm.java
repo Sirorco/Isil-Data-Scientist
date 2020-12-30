@@ -8,9 +8,8 @@ package traitementDM;
 import Protocol.RequestBigDataResult;
 import connectionJdbc.BeanJDBC;
 import connectionRServe.BeanRServe;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -56,7 +55,15 @@ public class Acm extends DataminingProcessing {
             getDataset().put(RequestBigDataResult.ACM_GLOBAL_TEXT, rs.getString("conclusionGenerale"));
             
             //Ajout du graph un à la hashtable
-            getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, rs.getBinaryStream("graph"));
+            InputStream is = rs.getBinaryStream("graph");
+            byte[] graph;
+            try {
+                graph = new byte[is.available()];
+                is.read(graph);
+                getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, graph);
+            } catch (IOException ex) {
+                Logger.getLogger(Acm.class.getName()).log(Level.SEVERE, null, ex);
+            }     
         } catch (SQLException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -93,7 +100,8 @@ public class Acm extends DataminingProcessing {
             fis = new ByteArrayInputStream(xp.asBytes());
             getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 5", "graph", fis);    
             //Ajout du graph un à la hashtable
-            getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, fis);
+            byte[] graph = xp.asBytes();
+            getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, graph);
         } catch (REXPMismatchException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
