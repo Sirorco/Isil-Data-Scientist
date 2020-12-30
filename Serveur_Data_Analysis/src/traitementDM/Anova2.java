@@ -86,13 +86,6 @@ public class Anova2 extends DataminingProcessing {
         //Import du graph 
         REXP xp = getBeanRServ().parseAndEval("r=readBin('Roads.png','raw',1400*800)");
         getBeanRServ().parseAndEval("unlink('Roads.png');r");
-        Image img = null;
-        try {
-            img = Toolkit.getDefaultToolkit().createImage(xp.asBytes());
-        } catch (REXPMismatchException ex) {
-            Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
         
         
         
@@ -100,7 +93,7 @@ public class Anova2 extends DataminingProcessing {
         InputStream fis;
         try {
             fis = new ByteArrayInputStream(xp.asBytes());
-            rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 2", "graph", fis);
+            getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 2", "graph", fis);
             //Ajout du graph un à la hashtable
             getDataset().put(RequestBigDataResult.ANOVA2_PLOT_ONE, fis);
         } catch (REXPMismatchException ex) {

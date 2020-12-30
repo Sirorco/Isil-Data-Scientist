@@ -101,12 +101,6 @@ public class Cah extends DataminingProcessing {
         //Import du graph 
         REXP xp = getBeanRServ().parseAndEval("r=readBin('Benefices.png','raw',800*800)");
         getBeanRServ().parseAndEval("unlink('Benefices.png');r");
-        Image img = null;
-        try {
-            img = Toolkit.getDefaultToolkit().createImage(xp.asBytes());
-        } catch (REXPMismatchException ex) {
-            Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
-        }
         
         
         
@@ -151,12 +145,6 @@ public class Cah extends DataminingProcessing {
         //Import du graph 
         xp = getBeanRServ().parseAndEval("r=readBin('Benefices2.png','raw',800*800)");
         getBeanRServ().parseAndEval("unlink('Benefices2.png');r");
-        img = null;
-        try {
-            img = Toolkit.getDefaultToolkit().createImage(xp.asBytes());
-        } catch (REXPMismatchException ex) {
-            Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
-        }
         
         
         
@@ -164,7 +152,7 @@ public class Cah extends DataminingProcessing {
         //update graph
         try {
             fis = new ByteArrayInputStream(xp.asBytes());
-            rs = getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 4", "graph", fis);   
+            getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 4", "graph", fis);   
             //Ajout du graph deux à la hashtable
         getDataset().put(RequestBigDataResult.CAH_PLOT_TWO, fis);
         } catch (REXPMismatchException ex) {
