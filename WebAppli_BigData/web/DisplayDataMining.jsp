@@ -4,6 +4,8 @@
     Author     : Thomas
 --%>
 
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.sql.Timestamp"%>
 <%@page import="Protocol.BaseRequest"%>
 <%@page import="Protocol.RequestDoBigData"%>
 <%@page import="Protocol.RequestBigDataResult"%>
@@ -44,18 +46,19 @@
             {
                 if (type.equalsIgnoreCase("Regr-Corr"))
                 {
-                    String Date = "14-12-1997";
+                    /*String Date = "14-12-1997";
                     String formule = "val = 4*x + 9*p";
                     String comment1 = "Nice !";
-                    String ccl = "Bof !";
-                    /*String Date = (String) resp.getValue(RequestBigDataResult.REGCORR_DATE);
-                    String formule = (String) resp.getValue(RequestBigDataResult.REGCORR_FORMULA);
+                    String ccl = "Bof !";*/
+                    Timestamp DateTime = (Timestamp) resp.getValue(RequestBigDataResult.REGCORR_DATE);
+                    String Date = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(DateTime);
+                    String title = (String) resp.getValue(RequestBigDataResult.REGCORR_GLOBAL_TITRE);
                     //String comment1 = (String) resp.getValue(RequestBigDataResult.REGCORR_PLOT_ONE); => Image
                     String comment1 = (String) resp.getValue(RequestBigDataResult.REGCORR_PLOT_ONE_TEXT);
-                    String ccl = (String) resp.getValue(RequestBigDataResult.REGCORR_GLOBAL_TEXT);*/
+                    String ccl = (String) resp.getValue(RequestBigDataResult.REGCORR_GLOBAL_TEXT);
                     %> <h4>Regression-Correlation</h4>
-                    <h4>Date de réalisation du traitement : <%=Date%></h4>
-                    <h4>Formule : <%=formule%></h4><%
+                    <h4>Titre : <%=title%></h4>
+                    <h4>Date de réalisation du traitement : <%=Date%></h4><%
                     //<img src="data:image/jpg;base64,${book.base64Image}" width="240" height="300"/>
                     %> <h4><%=comment1%></h4>
                     <h4><%=ccl%></h4>
@@ -63,11 +66,14 @@
                 }
                 else if (type.equalsIgnoreCase("Anova2"))
                 {
-                    String Date = (String) resp.getValue(RequestBigDataResult.ANOVA2_DATE);
+                    Timestamp DateTime = (Timestamp) resp.getValue(RequestBigDataResult.ANOVA2_DATE);
+                    String Date = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(DateTime);
+                    String title = (String) resp.getValue(RequestBigDataResult.ANOVA2_GLOBAL_TITRE);
                     //String comment1 = (String) resp.getValue(RequestBigDataResult.ANOVA2_PLOT_ONE); => Image
                     String comment1 = (String) resp.getValue(RequestBigDataResult.ANOVA2_PLOT_ONE_TEXT);
                     String ccl = (String) resp.getValue(RequestBigDataResult.ANOVA2_GLOBAL_TEXT);
                     %> <h4>Anova2</h4>
+                    <h4>Titre : <%=title%></h4>
                     <h4>Date de réalisation du traitement : <%=Date%></h4><%
                     //<img src="data:image/jpg;base64,${book.base64Image}" width="240" height="300"/>
                     %> <h4><%=comment1%></h4>
@@ -76,11 +82,14 @@
                 }
                 else if (type.equalsIgnoreCase("ACM"))
                 {       
-                    String Date = (String) resp.getValue(RequestBigDataResult.ACM_DATE);
+                    Timestamp DateTime = (Timestamp) resp.getValue(RequestBigDataResult.ACM_DATE);
+                    String Date = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(DateTime);
+                    String title = (String) resp.getValue(RequestBigDataResult.ACM_GLOBAL_TITRE);
                     //String comment1 = (String) resp.getValue(RequestBigDataResult.ACM_PLOT_ONE); => Image
                     String comment1 = (String) resp.getValue(RequestBigDataResult.ACM_PLOT_ONE_TEXT);
                     String ccl = (String) resp.getValue(RequestBigDataResult.ACM_GLOBAL_TEXT);
                     %> <h4>ACM</h4>
+                    <h4>Titre : <%=title%></h4>
                     <h4>Date de réalisation du traitement : <%=Date%></h4><%
                     //<img src="data:image/jpg;base64,${book.base64Image}" width="240" height="300"/>
                     %> <h4><%=comment1%></h4>
@@ -89,13 +98,16 @@
                 }
                 else if (type.equalsIgnoreCase("CAH"))
                 {
-                    String Date = (String) resp.getValue(RequestBigDataResult.CAH_DATE);
+                    Timestamp DateTime = (Timestamp) resp.getValue(RequestBigDataResult.CAH_DATE);
+                    String Date = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(DateTime);
+                    String title = (String) resp.getValue(RequestBigDataResult.CAH_GLOBAL_TITRE);
                     //String comment1 = (String) resp.getValue(RequestBigDataResult.CAH_PLOT_ONE); => Image
                     String comment1 = (String) resp.getValue(RequestBigDataResult.CAH_PLOT_ONE_TEXT);
                     //String comment1 = (String) resp.getValue(RequestBigDataResult.CAH_PLOT_TWO); => Image
                     String comment2 = (String) resp.getValue(RequestBigDataResult.CAH_PLOT_TWO_TEXT);
                     String ccl = (String) resp.getValue(RequestBigDataResult.REGCORR_GLOBAL_TEXT);
                     %> <h4>CAH</h4>
+                    <h4>Titre : <%=title%></h4>
                     <h4>Date de réalisation du traitement : <%=Date%></h4><%
                     //<img src="data:image/jpg;base64,${book.base64Image}" width="240" height="300"/>
                     %> <h4><%=comment1%></h4><%
