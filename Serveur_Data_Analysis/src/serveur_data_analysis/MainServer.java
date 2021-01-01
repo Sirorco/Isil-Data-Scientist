@@ -21,10 +21,11 @@ public class MainServer {
     private MainFrame mF;
     private int port;
     private ServerSocket sSocket = null;
-    private boolean isRunning = true;
+    private boolean isRunning;
     
     public MainServer (MainFrame mF)
     {
+        isRunning = true;
         this.mF = mF;
         //Recherche des infos dans le fichier properties
         ResourceBundle bundle = ResourceBundle.getBundle("properties.fichConfig");
@@ -36,7 +37,7 @@ public class MainServer {
         }
     }
     
-    private void open()
+    public void open()
     {
         Thread t = new Thread(new Runnable() {
             @Override
@@ -65,7 +66,7 @@ public class MainServer {
         t.start();
     }
     
-    private void close()
+    public void close()
     {
         mF.getjTextFieldLogServeur().setText("Fermeture du serveur d'analyse de données !");
         isRunning = false;
