@@ -1,0 +1,7 @@
+Problèmes possibles :
+
+- Erreur de TomCat concerant BouncyCastle : Solution redémarer TomCat
+
+- Fichier/Descripteur de déployement manquant. Dossier Web-Inf inexistant : Solution aller dans le dossier "web" et créer un dossier WEB-INF
+
+- Problème pour se connecter au serveur ou à la BDD : TomCat ne trouve pas le fichier de config donc les infos du serveur et de la BDD sont HardCodées.
