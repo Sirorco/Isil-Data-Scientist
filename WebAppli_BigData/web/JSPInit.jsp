@@ -31,8 +31,6 @@
 
                 %><p> <%=username%> <p><%
                     
-                String nbre = request.getParameter("nbre");
-                %><p> You are our <%=nbre%> client of the servlet<p><%
                     
                 session = request.getSession();
                 
@@ -63,7 +61,7 @@
             }
             else
             {
-                %> <h4>Login fail !</h4>
+                %> <h4>Login failed !</h4>
                 <h4>Bad username or password !</h4> <%
             }
         %>

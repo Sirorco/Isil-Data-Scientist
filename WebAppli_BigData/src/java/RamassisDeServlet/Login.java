@@ -82,7 +82,7 @@ public class Login extends HttpServlet {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }*/
         
-        port_auth = "50001";
+        port_auth = "50000";
         acs_address = "localhost";
 
     } 
