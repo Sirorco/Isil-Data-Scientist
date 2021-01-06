@@ -64,7 +64,7 @@
                     
                     String bimage= "<img src=\"data:image/png;base64,";
                     bimage += b64;
-                    bimage +="\" width=\"240\" height=\"300\"/>";
+                    bimage +="\" width=\"1024\" height=\"1024\"/>";
                     %> <h4>Regression-Correlation</h4>
                     <h4>Titre : <%=title%></h4>
                     <h4>Date de réalisation du traitement : <%=Date%></h4>
@@ -85,7 +85,7 @@
 
                     String bimage= "<img src=\"data:image/png;base64,";
                     bimage += b64;
-                    bimage +="\" width=\"240\" height=\"300\"/>";
+                    bimage +="\" width=\"1400\" height=\"1000\"/>";
 
                     %> <h4>Anova2</h4>
                     <h4>Titre : <%=title%></h4>
@@ -108,7 +108,7 @@
                     
                     String bimage= "<img src=\"data:image/png;base64,";
                     bimage += b64;
-                    bimage +="\" width=\"240\" height=\"300\"/>";
+                    bimage +="\" width=\"1400\" height=\"1000\"/>";
                     
                     %> <h4>ACM</h4>
                     <h4>Titre : <%=title%></h4>
@@ -132,16 +132,16 @@
                     String b64_img2 = javax.xml.bind.DatatypeConverter.printBase64Binary(data2);
                     String comment2 = (String) resp.getValue(RequestBigDataResult.CAH_PLOT_TWO_TEXT);
 
-                    String ccl = (String) resp.getValue(RequestBigDataResult.REGCORR_GLOBAL_TEXT);
+                    String ccl = (String) resp.getValue(RequestBigDataResult.CAH_GLOBAL_TEXT);
 
 
                     String bimage1= "<img src=\"data:image/png;base64,";
                     bimage1 += b64_img1;
-                    bimage1 +="\" width=\"240\" height=\"300\"/>";
+                    bimage1 +="\" width=\"720\" height=\"720\"/>";
 
                     String bimage2= "<img src=\"data:image/png;base64,";
                     bimage2 += b64_img2;
-                    bimage2 +="\" width=\"240\" height=\"300\"/>";
+                    bimage2 +="\" width=\"720\" height=\"720\"/>";
 
                     %> <h4>CAH</h4>
                     <h4>Titre : <%=title%></h4>
