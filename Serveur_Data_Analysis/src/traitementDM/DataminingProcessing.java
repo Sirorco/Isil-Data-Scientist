@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package serveur_data_analysis;
+package traitementDM;
 
 import connectionJdbc.BeanJDBC;
 import connectionRServe.BeanRServe;
@@ -14,6 +14,7 @@ import java.util.Hashtable;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import traitementDM.tests.datamining;
 
 /**
  *
@@ -21,9 +22,9 @@ import java.util.logging.Logger;
  */
 public abstract class DataminingProcessing {
     
-    BeanJDBC beanJdbc;
-    BeanRServe beanRServ;
-    Hashtable datasetReturn;
+    private BeanJDBC beanJdbc;
+    private BeanRServe beanRServ;
+    private Hashtable dataset;
     
     public DataminingProcessing()
     {
@@ -32,18 +33,16 @@ public abstract class DataminingProcessing {
         String name = bundle.getString("sgbd.name");
         String user = bundle.getString("sgbd.user");
         String mdp = bundle.getString("sgbd.mdp");
-
-        //Chargement du driver de MYSQL
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        name = "jdbc:mysql://82.212.170.117:3306/bd_mouvements?useUnicode=true &useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false& serverTimezone=UTC";
         beanJdbc = new BeanJDBC(name, user, mdp);
-        
         beanRServ = new BeanRServe();
-        datasetReturn = new Hashtable();
+        dataset = new Hashtable();
+    }
+    
+    public DataminingProcessing(BeanJDBC beanJdbc, BeanRServe beanRServ)
+    {
+        this.beanJdbc = beanJdbc;   
+        this.beanRServ = beanRServ;
+        dataset = new Hashtable();
     }
     
     
@@ -85,7 +84,7 @@ public abstract class DataminingProcessing {
                 query = query.substring(0, query.length() - 2);
                 query += ")";
                 System.out.println(query);
-                beanRServ.voidEval(query);
+                getBeanRServ().voidEval(query);
 
                 rs.beforeFirst();    
             }
@@ -100,9 +99,51 @@ public abstract class DataminingProcessing {
             
             System.out.println(query);
             
-            beanRServ.voidEval(query);
+            getBeanRServ().voidEval(query);
         } catch (SQLException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    /**
+     * @return the beanJdbc
+     */
+    public BeanJDBC getBeanJdbc() {
+        return beanJdbc;
+    }
+
+    /**
+     * @param beanJdbc the beanJdbc to set
+     */
+    public void setBeanJdbc(BeanJDBC beanJdbc) {
+        this.beanJdbc = beanJdbc;
+    }
+
+    /**
+     * @return the beanRServ
+     */
+    public BeanRServe getBeanRServ() {
+        return beanRServ;
+    }
+
+    /**
+     * @param beanRServ the beanRServ to set
+     */
+    public void setBeanRServ(BeanRServe beanRServ) {
+        this.beanRServ = beanRServ;
+    }
+
+    /**
+     * @return the dataset
+     */
+    public Hashtable getDataset() {
+        return dataset;
+    }
+
+    /**
+     * @param dataset the dataset to set
+     */
+    public void setDataset(Hashtable dataset) {
+        this.dataset = dataset;
     }
 }
