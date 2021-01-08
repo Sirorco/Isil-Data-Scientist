@@ -32,7 +32,7 @@ public class BeanRServe {
         }
     }
     
-    private void readTable(String nameDataset, String pathCsvFile, boolean header)
+    private synchronized void readTable(String nameDataset, String pathCsvFile, boolean header)
     {
         if(header)
         {
@@ -53,7 +53,7 @@ public class BeanRServe {
     }
     
     
-    public void voidEval(String eval){
+    public synchronized void voidEval(String eval){
         try {
             connection.voidEval(eval);
         } catch (RserveException ex) {
@@ -61,7 +61,7 @@ public class BeanRServe {
         }
     }
     
-    public REXP parseAndEval(String eval){
+    public synchronized REXP parseAndEval(String eval){
         try {
             return connection.parseAndEval(eval);
         } catch (RserveException ex) {
@@ -74,7 +74,7 @@ public class BeanRServe {
         return null;
     }
     
-    public REXP eval(String eval){
+    public synchronized REXP eval(String eval){
         try {
             return connection.eval(eval);
         } catch (RserveException ex) {
@@ -82,7 +82,7 @@ public class BeanRServe {
         }
         return null;
     }
-    private void doACP_ACM(boolean isACP ,String nameDatasetOut, String nameDatasetIn, List qualiSupList, List quantiSupList)
+    private synchronized void doACP_ACM(boolean isACP ,String nameDatasetOut, String nameDatasetIn, List qualiSupList, List quantiSupList)
     {
         String typeAnalyse;
         if(isACP)
