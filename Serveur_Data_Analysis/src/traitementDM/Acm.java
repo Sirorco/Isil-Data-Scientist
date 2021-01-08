@@ -8,9 +8,8 @@ package traitementDM;
 import Protocol.RequestBigDataResult;
 import connectionJdbc.BeanJDBC;
 import connectionRServe.BeanRServe;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -56,7 +55,15 @@ public class Acm extends DataminingProcessing {
             getDataset().put(RequestBigDataResult.ACM_GLOBAL_TEXT, rs.getString("conclusionGenerale"));
             
             //Ajout du graph un à la hashtable
-            getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, rs.getBinaryStream("graph"));
+            InputStream is = rs.getBinaryStream("graph");
+            byte[] graph;
+            try {
+                graph = new byte[is.available()];
+                is.read(graph);
+                getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, graph);
+            } catch (IOException ex) {
+                Logger.getLogger(Acm.class.getName()).log(Level.SEVERE, null, ex);
+            }     
         } catch (SQLException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -75,13 +82,14 @@ public class Acm extends DataminingProcessing {
         getBeanRServ().voidEval("Routes <- Routes[sample(nrow(Routes),200),]");
         
         getBeanRServ().eval("library(FactoMineR)");
-        getBeanRServ().eval("library('factoextra')");
+        //getBeanRServ().eval("library('factoextra')");
         
         //Préparation du fichier image dans RServe
         getBeanRServ().eval("png(file='Routes.png',width=1400,height=800)");
         //Création du graph
         getBeanRServ().parseAndEval("acm <- MCA(Routes, graph=FALSE)"); 
-        getBeanRServ().parseAndEval("print(fviz_mca_var(acm, repel = TRUE));dev.off()");
+        //getBeanRServ().parseAndEval("print(fviz_mca_var(acm, repel = TRUE));dev.off()");
+        getBeanRServ().parseAndEval("print(plot(acm, invisible='ind'));dev.off()");
         //Import du graph 
         REXP xp = getBeanRServ().parseAndEval("r=readBin('Routes.png','raw',1400*800)");
         
@@ -93,7 +101,8 @@ public class Acm extends DataminingProcessing {
             fis = new ByteArrayInputStream(xp.asBytes());
             getBeanJdbc().Update("bd_decisions.analyse_graph", "id = 5", "graph", fis);    
             //Ajout du graph un à la hashtable
-            getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, fis);
+            byte[] graph = xp.asBytes();
+            getDataset().put(RequestBigDataResult.ACM_PLOT_ONE, graph);
         } catch (REXPMismatchException ex) {
             Logger.getLogger(datamining.class.getName()).log(Level.SEVERE, null, ex);
         }
