@@ -66,7 +66,7 @@ public class TraitementClient implements Runnable {
     private BaseRequest reponseClient = null;
     private String saltClient = null;
 
-    public TraitementClient(Socket cSocket, MainFrame mF) {
+    public TraitementClient(Socket cSocket, MainFrame mF, BeanRServe beanRServe) {
         this.mF = mF;
         this.cSocket = cSocket;
         try {
@@ -88,11 +88,11 @@ public class TraitementClient implements Runnable {
             e.printStackTrace();
         }
         beanJdbc = new BeanJDBC(name, user, mdp);
-        beanRServe = new BeanRServe();
-        acm = new Acm(beanJdbc, beanRServe);
-        anova2 = new Anova2(beanJdbc, beanRServe);
-        cah = new Cah(beanJdbc, beanRServe);
-        regCor = new RegCor(beanJdbc, beanRServe);
+        this.beanRServe = beanRServe;
+        acm = new Acm(beanJdbc, this.beanRServe);
+        anova2 = new Anova2(beanJdbc, this.beanRServe);
+        cah = new Cah(beanJdbc, this.beanRServe);
+        regCor = new RegCor(beanJdbc, this.beanRServe);
         
     }
     
