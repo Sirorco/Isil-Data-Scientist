@@ -5,6 +5,7 @@
  */
 package serveur_data_analysis;
 
+import connectionRServe.BeanRServe;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -22,6 +23,7 @@ public class MainServer {
     private int port;
     private ServerSocket sSocket = null;
     private boolean isRunning;
+    private BeanRServe beanRServe; //Objet pour la connexion à R
     
     public MainServer (MainFrame mF)
     {
@@ -35,6 +37,7 @@ public class MainServer {
         } catch (IOException ex) {
             Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
         }
+        beanRServe = new BeanRServe();
     }
     
     public void open()
@@ -53,7 +56,7 @@ public class MainServer {
                         mF.getjTextFieldLogServeur().setText("Connexion client reçue !");
                         System.out.println("Connexion client reçue !");
                         
-                        Thread t = new Thread(new TraitementClient(cSocket, mF));
+                        Thread t = new Thread(new TraitementClient(cSocket, mF, beanRServe));
                         t.start();
                         
                     } catch (IOException ex) {

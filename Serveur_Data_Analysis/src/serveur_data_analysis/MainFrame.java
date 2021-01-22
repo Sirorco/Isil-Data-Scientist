@@ -86,6 +86,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void jButtonArrêtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonArrêtActionPerformed
         if(ms != null)
             ms.close();
+        System.exit(0);
     }//GEN-LAST:event_jButtonArrêtActionPerformed
 
     /**

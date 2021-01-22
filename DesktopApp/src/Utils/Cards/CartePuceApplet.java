@@ -72,11 +72,12 @@ public class CartePuceApplet extends Applet
 
         switch (buffer[ISO7816.OFFSET_INS])
         {
-            case GET_LOGINS: getLogin(apdu);
-                        return;
+            case GET_LOGINS:    getLogin(apdu);
+                                return;
             case VERIFY:    verify(apdu);
                             return; 
-            case LOGIN_DONE: loginDone();
+            case LOGIN_DONE:    loginDone();
+                                return;
             default: ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
         }
     }
